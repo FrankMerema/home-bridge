@@ -1,0 +1,19 @@
+{
+  "name": "merema-bridge",
+  "version": "0.0.1",
+  "description": "The homebridge for home automation",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FrankMerema/merema-bridge.git"
+  },
+  "author": "Frank Merema",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/FrankMerema/merema-bridge/issues"
+  },
+  "homepage": "https://github.com/FrankMerema/merema-bridge#readme"
+}
