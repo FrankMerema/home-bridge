@@ -1,5 +1,5 @@
 {
-  "name": "merema-bridge",
+  "name": "home-bridge",
   "version": "0.0.1",
   "description": "The homebridge for home automation",
   "main": "dist/server.js",
