@@ -70,3 +70,6 @@ typings/
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
+
+#own config files
+*.config.json

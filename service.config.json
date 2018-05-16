@@ -1,0 +1,28 @@
+{
+    "serverPort": "8000",
+    "database": {
+        "host": "localhost",
+        "port": 27017,
+        "name": "home-automation",
+        "config": {
+            "reconnectTries": 100,
+            "reconnectInterval": 1000
+        }
+    },
+    "plugins": [
+        {
+            "name": "driveway-lights",
+            "type": "switch",
+            "host": "192.168.2.124",
+            "port": 3000
+        },
+        {
+            "name": "somfy-tahoma",
+            "type": "tahoma",
+            "host": "",
+            "port": 0,
+            "username": "",
+            "password": ""
+        }
+    ]
+}

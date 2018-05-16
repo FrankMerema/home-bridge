@@ -1,19 +1,30 @@
 {
-  "name": "home-bridge",
-  "version": "0.0.1",
-  "description": "The homebridge for home automation",
-  "main": "dist/server.js",
-  "scripts": {
-    "build": "tsc"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/FrankMerema/merema-bridge.git"
-  },
-  "author": "Frank Merema",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/FrankMerema/merema-bridge/issues"
-  },
-  "homepage": "https://github.com/FrankMerema/merema-bridge#readme"
+    "name": "home-bridge",
+    "version": "0.0.1",
+    "description": "The homebridge for home automation",
+    "main": "dist/server.js",
+    "scripts": {
+        "build": "tsc",
+        "start": "node -r ts-node/register src/start.ts"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/FrankMerema/merema-bridge.git"
+    },
+    "devDependencies": {
+        "@types/express": "4.11.1",
+        "@types/mongoose": "5.0.13",
+        "@types/node": "10.0.6",
+        "ts-node": "6.0.3",
+        "typescript": "2.8.3"
+    },
+    "dependencies": {
+        "abstract-database": "0.0.3",
+        "axios": "0.18.0",
+        "body-parser": "1.18.2",
+        "express": "4.16.3",
+        "mongoose": "5.1.1"
+    },
+    "author": "Frank Merema",
+    "license": "MIT"
 }
