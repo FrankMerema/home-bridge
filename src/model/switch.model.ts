@@ -1,15 +1,9 @@
 import { Document, Schema } from 'mongoose';
+import { StateHistory } from './state-history.model';
 import { State } from './state.enum';
-
-export interface StateHistory {
-    state: State;
-    executed: Date;
-    executedBy: string;
-}
 
 export interface SwitchModel extends Document {
     created: Date;
-    direction: string;
     host: string;
     port: number;
     name: string;
@@ -19,8 +13,8 @@ export interface SwitchModel extends Document {
 }
 
 export const SwitchSchema = new Schema({
+    _id: Schema.Types.ObjectId,
     created: {type: Date, default: Date.now()},
-    direction: String,
     host: String,
     port: Number,
     name: String,

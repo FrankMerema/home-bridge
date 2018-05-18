@@ -29,12 +29,12 @@ export class SwitchHandler {
             });
     }
 
-    addSwitch(pin: number, direction: string, host: string, port: number, name: string): Promise<SwitchModel> {
-        if (!pin || !direction || !host || !port || !name) {
-            return Promise.reject({error: 'Should set pin, direction, host, port and name!'});
+    addSwitch(pin: number, host: string, port: number, name: string): Promise<SwitchModel> {
+        if (!pin || !host || !port || !name) {
+            return Promise.reject({error: 'Should set pin, host, port and name!'});
         }
 
-        return axios.post<SwitchModel>(`http://${host}:${port}/api/switch`, {pin: pin, direction: direction})
+        return axios.post<SwitchModel>(`http://${host}:${port}/api/switch`, {pin: pin})
             .then((createdSwitch) => {
                 const newSwitch = createdSwitch.data;
                 newSwitch.host = host;
@@ -76,11 +76,15 @@ export class SwitchHandler {
             });
     }
 
-    changeStatus(switchId: string): Promise<SwitchModel> {
+    changeState(switchId: string, state?: State): Promise<SwitchModel> {
         return this.switchCollection.findOne({_id: switchId})
             .then(foundSwitch => {
                 if (foundSwitch) {
-                    const newState = {state: foundSwitch.state === State.ON ? State.OFF : State.ON};
+                    const newState = {
+                        state: state ? state :
+                            foundSwitch.state === State.ON ?
+                                State.OFF : State.ON
+                    };
                     return axios.post(`http://${foundSwitch.host}:${foundSwitch.port}/api/switch/state/${foundSwitch.pin}`, newState)
                         .then(() => {
                             foundSwitch.state = newState.state;

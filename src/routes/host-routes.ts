@@ -6,9 +6,9 @@ export class HostRoutes {
     private readonly router: Router;
     private hostHandler: HostHandler;
 
-    constructor() {
+    constructor(hostHandler: HostHandler) {
         this.router = Router();
-        this.hostHandler = new HostHandler();
+        this.hostHandler = hostHandler;
         this.setupRoutes();
     }
 

@@ -1,14 +1,14 @@
 import { Request, Response, Router } from 'express';
-import { SwitchHandler } from '../handlers/switch-handler';
+import { SensorHandler } from '../handlers/sensor-handler';
 
-export class SwitchRoutes {
+export class SensorRoutes {
 
     private readonly router: Router;
-    private switchHandler: SwitchHandler;
+    private sensorHandler: SensorHandler;
 
-    constructor(switchHandler: SwitchHandler) {
+    constructor(sensorHandler: SensorHandler) {
         this.router = Router();
-        this.switchHandler = switchHandler;
+        this.sensorHandler = sensorHandler;
         this.setupRoutes();
     }
 
@@ -17,20 +17,21 @@ export class SwitchRoutes {
     }
 
     private setupRoutes(): void {
-        this.router.get('/all/:host/:port', (req: Request, res: Response) => this.getAllSwitchesForHost(req, res));
+        this.router.get('/all/:host/:port', (req: Request, res: Response) => this.getAllSensorsForHost(req, res));
         this.router.get('/status/:id', (req: Request, res: Response) => this.getState(req, res));
 
-        this.router.post('', (req: Request, res: Response) => this.addSwitch(req, res));
-        this.router.post('/status/:id', (req: Request, res: Response) => this.changeState(req, res));
+        this.router.post('', (req: Request, res: Response) => this.addSensor(req, res));
+
+        this.router.put('/:host/:port/:pin', (req: Request, res: Response) => this.updateState(req, res));
 
         this.router.delete('/:id', (req: Request, res: Response) => this.removeSwitch(req, res));
     }
 
-    private getAllSwitchesForHost(req: Request, res: Response): void {
+    private getAllSensorsForHost(req: Request, res: Response): void {
         const host = req.params.host;
         const port = req.params.port;
 
-        this.switchHandler.getSwitches(host, port)
+        this.sensorHandler.getSensors(host, port)
             .then(switches => {
                 res.json(switches);
             }).catch(error => {
@@ -41,7 +42,7 @@ export class SwitchRoutes {
     private getState(req: Request, res: Response): void {
         const switchId = req.params.id;
 
-        this.switchHandler.getSwitchState(switchId)
+        this.sensorHandler.getSensorState(switchId)
             .then(status => {
                 res.json({status: status});
             }).catch(error => {
@@ -49,24 +50,28 @@ export class SwitchRoutes {
         });
     }
 
-    private changeState(req: Request, res: Response): void {
-        const switchId = req.params.id;
+    private updateState(req: Request, res: Response): void {
+        const host = req.params.host;
+        const port = req.params.port;
+        const pin = req.params.pin;
+        const newState = req.body.state;
 
-        this.switchHandler.changeState(switchId)
-            .then((updatedSwitch) => {
-                res.json(updatedSwitch);
+        this.sensorHandler.changeState(host, port, pin, newState)
+            .then(() => {
+                res.json({});
             }).catch(error => {
             res.status(404).json(error);
         });
     }
 
-    private addSwitch(req: Request, res: Response): void {
+    private addSensor(req: Request, res: Response): void {
         const pin = req.body.pin;
         const host = req.body.host;
         const port = req.body.port;
         const name = req.body.name;
+        const targetId = req.body.targetId;
 
-        this.switchHandler.addSwitch(pin, host, port, name)
+        this.sensorHandler.addSensor(pin, host, port, name, targetId)
             .then((s: any) => {
                 res.json(s);
             }).catch(error => {
@@ -75,9 +80,9 @@ export class SwitchRoutes {
     }
 
     private removeSwitch(req: Request, res: Response): void {
-        const switchId = req.params.id;
+        const sensorId = req.params.id;
 
-        this.switchHandler.removeSwitch(switchId)
+        this.sensorHandler.removeSensor(sensorId)
             .then(() => {
                 res.status(200).json({});
             }).catch(error => {
