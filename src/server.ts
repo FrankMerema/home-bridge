@@ -19,12 +19,17 @@ export function start() {
 
     const hostHandler = new HostHandler();
     const switchHandler = new SwitchHandler();
-    const sensorHandler = new SensorHandler(switchHandler);
-
-
     app.use('/api/host', new HostRoutes(hostHandler).getRouter());
     app.use('/api/switch', new SwitchRoutes(switchHandler).getRouter());
-    app.use('/api/sensor', new SensorRoutes(sensorHandler).getRouter());
+
+
+    switchHandler.initialize()
+        .then(() => {
+            const sensorHandler = new SensorHandler(switchHandler);
+            app.use('/api/sensor', new SensorRoutes(sensorHandler).getRouter());
+        });
+
+
     // app.use('/api/tahoma', new TahomaRoutes(plugin.host, plugin.port).getRouter());
 
     app.get('/api/status', (req: Request, res: Response) => {

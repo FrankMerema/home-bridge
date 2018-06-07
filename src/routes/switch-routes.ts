@@ -17,7 +17,7 @@ export class SwitchRoutes {
     }
 
     private setupRoutes(): void {
-        this.router.get('/all/:host/:port', (req: Request, res: Response) => this.getAllSwitchesForHost(req, res));
+        this.router.get('/all/:hostId', (req: Request, res: Response) => this.getAllSwitchesForHost(req, res));
         this.router.get('/status/:id', (req: Request, res: Response) => this.getState(req, res));
 
         this.router.post('', (req: Request, res: Response) => this.addSwitch(req, res));
@@ -27,10 +27,9 @@ export class SwitchRoutes {
     }
 
     private getAllSwitchesForHost(req: Request, res: Response): void {
-        const host = req.params.host;
-        const port = req.params.port;
+        const hostId = req.params.hostId;
 
-        this.switchHandler.getSwitches(host, port)
+        this.switchHandler.getSwitches(hostId)
             .then(switches => {
                 res.json(switches);
             }).catch(error => {
@@ -62,12 +61,11 @@ export class SwitchRoutes {
 
     private addSwitch(req: Request, res: Response): void {
         const pin = req.body.pin;
-        const host = req.body.host;
-        const port = req.body.port;
+        const hostId = req.body.hostId;
         const name = req.body.name;
 
-        this.switchHandler.addSwitch(pin, host, port, name)
-            .then((s: any) => {
+        this.switchHandler.addSwitch(pin, hostId, name)
+            .then(s => {
                 res.json(s);
             }).catch(error => {
             res.status(404).json(error);

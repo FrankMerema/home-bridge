@@ -4,8 +4,7 @@ import { State } from './state.enum';
 
 export interface SwitchModel extends Document {
     created: Date;
-    host: string;
-    port: number;
+    host: any;
     name: string;
     pin: number;
     state: State;
@@ -13,12 +12,22 @@ export interface SwitchModel extends Document {
 }
 
 export const SwitchSchema = new Schema({
-    _id: Schema.Types.ObjectId,
-    created: {type: Date, default: Date.now()},
-    host: String,
-    port: Number,
-    name: String,
-    pin: Number,
-    state: Number,
-    stateHistory: {type: Array, default: []}
+        host: {type: Schema.Types.ObjectId, ref: 'host'},
+        name: String,
+        pin: Number,
+        state: Number,
+        stateHistory: {type: Array, default: []},
+    },
+    {
+        timestamps: {createdAt: 'created', updatedAt: false}
+    });
+
+SwitchSchema.set('toJSON', {
+    virtuals: true,
+    versionKey: false,
+    depopulate: true,
+    transform: (doc: any, converted: any) => {
+        delete converted._id;
+    }
 });
+

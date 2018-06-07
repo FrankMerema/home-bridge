@@ -1,42 +1,42 @@
 import { Collection, Database } from 'abstract-database';
 import axios from 'axios';
-import { HostModel, HostSchema, HostStatus } from '../model/host.model';
+import { HostDto, HostModel, HostSchema, HostStatus } from '../model/host.model';
 
 const config = require('../../service.config.json');
 
 export class HostHandler {
 
-    private collection: Collection<HostModel>;
-    private readonly outputFields = {hostName: true, ip: true, port: true, status: true, _id: false};
+    private hostCollection: Collection<HostModel>;
 
     constructor() {
         const connection = new Database(config.database.host, config.database.port,
             config.database.name, config.database.config).getConnection();
-        this.collection = new Collection<HostModel>(connection, 'host', HostSchema, 'hosts');
+        this.hostCollection = new Collection<HostModel>(connection, 'host', HostSchema, 'hosts');
 
-        this.getAllHosts().then(hosts => {
-            hosts.forEach(host => {
-                axios.get(`http://${host.ip}:${host.port}/api/status`)
-                    .then(() => {
-                        this.updateHostStatus(host.ip, 'online');
-                    }).catch(() => {
-                    this.updateHostStatus(host.ip, 'offline');
-                    console.error(`${host.ip} didn't respond so set to 'offline'`);
+        this.hostCollection.find({})
+            .then(hosts => {
+                hosts.forEach(host => {
+                    axios.get(`http://${host.ip}:${host.port}/api/status`)
+                        .then(() => {
+                            this.updateHostStatus(host.ip, 'online');
+                        }).catch(() => {
+                        this.updateHostStatus(host.ip, 'offline');
+                        console.error(`${host.hostName} didn't respond so set to 'offline'`);
+                    });
                 });
             });
-        });
     }
 
-    getHost(ip: string): Promise<HostModel> {
-        return this.collection.findOne({ip: ip}, this.outputFields);
+    getHost(id: string): Promise<HostModel> {
+        return this.hostCollection.aggregateOne({_id: id}, HostDto);
     }
 
-    getHostStatus(ip: string): Promise<HostModel> {
-        return this.collection.findOne({ip: ip}, {_id: false, status: true});
+    getHostStatus(id: string): Promise<HostModel> {
+        return this.hostCollection.findOne({_id: id}, {status: true});
     }
 
     getAllHosts(): Promise<Array<HostModel>> {
-        return this.collection.find({}, this.outputFields);
+        return this.hostCollection.aggregate({}, HostDto);
     }
 
     addHost(hostName: string, ip: string, port: number): Promise<HostModel> {
@@ -45,15 +45,17 @@ export class HostHandler {
         }
 
         const newHost = <HostModel>{hostName: hostName, ip: ip, port: port, status: 'online'};
+        console.info(`New host added: ${newHost.hostName}`);
 
-        return this.collection.findOneAndUpdate({ip: ip}, newHost, {upsert: true, new: true});
+        return this.hostCollection.findOneAndUpdate({ip: ip}, newHost, {upsert: true, new: true});
     }
 
-    removeHost(ip: string): Promise<any> {
-        return this.collection.findOneAndRemove({ip: ip});
+    removeHost(id: string): Promise<any> {
+        console.info(`Removing host with ip: ${id}`);
+        return this.hostCollection.findOneAndRemove({_id: id});
     }
 
     updateHostStatus(ip: string, status: HostStatus) {
-        return this.collection.findOneAndUpdate({ip: ip}, {status: status});
+        return this.hostCollection.findOneAndUpdate({ip: ip}, {status: status});
     }
 }
