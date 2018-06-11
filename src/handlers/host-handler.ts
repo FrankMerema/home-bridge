@@ -39,13 +39,13 @@ export class HostHandler {
         return this.hostCollection.aggregate({}, HostDto);
     }
 
-    addHost(hostName: string, ip: string, port: number): Promise<HostModel> {
-        if (!hostName || !ip || !port) {
-            return Promise.reject('Should set hostName, ip and port!');
+    addHost(hostName: string, name: string, ip: string, port: number): Promise<HostModel> {
+        if (!hostName || !name || !ip || !port) {
+            return Promise.reject('Should set hostName, name, ip and port!');
         }
 
-        const newHost = <HostModel>{hostName: hostName, ip: ip, port: port, status: 'online'};
-        console.info(`New host added: ${newHost.hostName}`);
+        const newHost = <HostModel>{hostName: hostName, name: name, ip: ip, port: port, status: 'online'};
+        console.info(`New host added: ${newHost.name}`);
 
         return this.hostCollection.findOneAndUpdate({ip: ip}, newHost, {upsert: true, new: true});
     }

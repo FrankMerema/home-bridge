@@ -72,10 +72,11 @@ export class HostRoutes {
 
     private addHost(req: Request, res: Response): void {
         const hostName = req.body.host;
+        const name = req.body.name;
         const ip = req.body.ip;
         const port = req.body.port;
 
-        this.hostHandler.addHost(hostName, ip, port)
+        this.hostHandler.addHost(hostName, name, ip, port)
             .then(addedHost => {
                 res.json(addedHost);
             }).catch(error => {

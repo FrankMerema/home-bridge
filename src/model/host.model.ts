@@ -4,6 +4,7 @@ export type HostStatus = 'online' | 'offline';
 
 export interface HostModel extends Document {
     created: Date;
+    name: string;
     hostName: string;
     ip: string;
     port: number;
@@ -11,6 +12,7 @@ export interface HostModel extends Document {
 }
 
 export const HostSchema = new Schema({
+        name: String,
         hostName: String,
         ip: String,
         port: Number,
@@ -22,7 +24,7 @@ export const HostSchema = new Schema({
 
 export const HostDto = {
     id: '$_id',
-    created: true,
+    name: true,
     hostName: true,
     status: true,
     _id: false,
@@ -32,6 +34,7 @@ HostSchema.set('toJSON', {
     virtuals: true,
     versionKey: false,
     transform: (doc: any, converted: any) => {
+        delete converted.created;
         delete converted._id;
     }
 });

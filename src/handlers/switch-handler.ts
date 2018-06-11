@@ -75,6 +75,7 @@ export class SwitchHandler {
     getSwitches(hostId: string): Promise<Array<SwitchModel>> {
         return this.switchCollection.find({}, null, {
             path: 'host',
+            select: 'created _id hostName status',
             match: {_id: hostId}
         });
     }

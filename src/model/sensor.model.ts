@@ -23,6 +23,7 @@ SensorSchema.set('toJSON', {
     versionKey: false,
     depopulate: true,
     transform: (doc: any, converted: any) => {
+        delete converted.created;
         delete converted._id;
     }
 });
