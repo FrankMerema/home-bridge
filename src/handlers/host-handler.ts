@@ -1,4 +1,4 @@
-import { Collection, Database } from 'abstract-database';
+import { Collection, MongoAtlasDatabase } from 'abstract-database';
 import axios from 'axios';
 import { HostDto, HostModel, HostSchema, HostStatus } from '../model/host.model';
 
@@ -9,8 +9,9 @@ export class HostHandler {
     private hostCollection: Collection<HostModel>;
 
     constructor() {
-        const connection = new Database(config.database.host, config.database.port,
-            config.database.name, config.database.config).getConnection();
+        const connection = new MongoAtlasDatabase(config.database.username, config.database.password,
+            config.database.host, config.database.name, config.database.config).getConnection();
+
         this.hostCollection = new Collection<HostModel>(connection, 'host', HostSchema, 'hosts');
 
         this.hostCollection.find({})

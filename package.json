@@ -19,7 +19,7 @@
         "typescript": "2.8.4"
     },
     "dependencies": {
-        "abstract-database": "^0.0.6",
+        "abstract-database": "^0.0.7",
         "axios": "0.18.0",
         "body-parser": "1.18.3",
         "express": "4.16.3",

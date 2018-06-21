@@ -1,4 +1,4 @@
-import { Collection, Database } from 'abstract-database';
+import { Collection, MongoAtlasDatabase } from 'abstract-database';
 import axios from 'axios';
 import { HostModel, HostSchema } from '../model/host.model';
 import { SensorModel, SensorSchema } from '../model/sensor.model';
@@ -15,7 +15,9 @@ export class SensorHandler {
     private switchHandler: SwitchHandler;
 
     constructor(switchHandler: SwitchHandler) {
-        const connection = new Database(config.database.host, config.database.port, config.database.name, config.database.config).getConnection();
+        const connection = new MongoAtlasDatabase(config.database.username, config.database.password,
+            config.database.host, config.database.name, config.database.config).getConnection();
+
         this.sensorCollection = new Collection<SensorModel>(connection, 'sensor', SensorSchema, 'sensors');
         this.hostCollection = new Collection<HostModel>(connection, 'host', HostSchema, 'hosts');
 

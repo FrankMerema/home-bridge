@@ -1,4 +1,4 @@
-import { Collection, Database } from 'abstract-database';
+import { Collection, MongoAtlasDatabase } from 'abstract-database';
 import axios from 'axios';
 import { HostModel, HostSchema } from '../model/host.model';
 import { State } from '../model/state.enum';
@@ -12,8 +12,9 @@ export class SwitchHandler {
     private hostCollection: Collection<HostModel>;
 
     constructor() {
-        const connection = new Database(config.database.host, config.database.port,
-            config.database.name, config.database.config).getConnection();
+        const connection = new MongoAtlasDatabase(config.database.username, config.database.password,
+            config.database.host, config.database.name, config.database.config).getConnection();
+
         this.switchCollection = new Collection<SwitchModel>(connection, 'switch', SwitchSchema, 'switches');
         this.hostCollection = new Collection<HostModel>(connection, 'host', HostSchema, 'hosts');
     }
