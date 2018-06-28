@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { HostHandler } from './handlers/host-handler';
 import { SensorHandler } from './handlers/sensor-handler';
 import { SwitchHandler } from './handlers/switch-handler';
+import { UserHandler } from './handlers/user-handler';
+import { UserRoutes } from './routes/authentication/user-routes';
 import { HostRoutes } from './routes/host-routes';
 import { SensorRoutes } from './routes/sensor-routes';
 import { SwitchRoutes } from './routes/switch-routes';
@@ -9,6 +11,7 @@ import { SwitchRoutes } from './routes/switch-routes';
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
+
 const config = require('../service.config.json');
 
 export function start() {
@@ -19,16 +22,18 @@ export function start() {
 
     const hostHandler = new HostHandler();
     const switchHandler = new SwitchHandler();
+    const userHandler = new UserHandler();
+
+    app.use('/api/user', new UserRoutes(userHandler).getRouter());
+
     app.use('/api/host', new HostRoutes(hostHandler).getRouter());
     app.use('/api/switch', new SwitchRoutes(switchHandler).getRouter());
-
 
     switchHandler.initialize()
         .then(() => {
             const sensorHandler = new SensorHandler(switchHandler);
             app.use('/api/sensor', new SensorRoutes(sensorHandler).getRouter());
         });
-
 
     // app.use('/api/tahoma', new TahomaRoutes(plugin.host, plugin.port).getRouter());
 

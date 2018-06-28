@@ -60,9 +60,7 @@ export class SwitchRoutes {
     }
 
     private addSwitch(req: Request, res: Response): void {
-        const pin = req.body.pin;
-        const hostId = req.body.hostId;
-        const name = req.body.name;
+        const {pin, hostId, name} = req.body;
 
         this.switchHandler.addSwitch(pin, hostId, name)
             .then(s => {

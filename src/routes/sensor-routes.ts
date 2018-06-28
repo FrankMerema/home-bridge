@@ -51,8 +51,7 @@ export class SensorRoutes {
     }
 
     private updateState(req: Request, res: Response): void {
-        const hostId = req.params.hostId;
-        const pin = req.params.pin;
+        const {hostId, pin} = req.params;
         const newState = req.body.state;
 
         this.sensorHandler.changeState(hostId, pin, newState)
@@ -64,8 +63,7 @@ export class SensorRoutes {
     }
 
     private addTarget(req: Request, res: Response): void {
-        const sensorId = req.params.sensorId;
-        const targetId = req.params.targetId;
+        const {sensorId, targetId} = req.params;
 
         this.sensorHandler.addTarget(sensorId, targetId)
             .then(s => {
@@ -76,10 +74,7 @@ export class SensorRoutes {
     }
 
     private addSensor(req: Request, res: Response): void {
-        const pin = req.body.pin;
-        const hostId = req.body.hostId;
-        const name = req.body.name;
-        const targetId = req.body.targetId;
+        const {pin, hostId, name, targetId} = req.body;
 
         this.sensorHandler.addSensor(pin, hostId, name, targetId)
             .then(s => {

@@ -71,10 +71,7 @@ export class HostRoutes {
     }
 
     private addHost(req: Request, res: Response): void {
-        const hostName = req.body.host;
-        const name = req.body.name;
-        const ip = req.body.ip;
-        const port = req.body.port;
+        const {hostName, name, ip, port} = req.body;
 
         this.hostHandler.addHost(hostName, name, ip, port)
             .then(addedHost => {
