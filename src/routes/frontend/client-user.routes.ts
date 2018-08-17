@@ -1,14 +1,15 @@
 import { Request, Response, Router } from 'express';
 import { UserHandler } from '../../handlers/user-handler';
+import { jwtMiddleware } from '../../middleware/jwt-verifier.middleware';
 
-export class UserRoutes {
+export class ClientUserRoutes {
 
     private readonly router: Router;
-    private userHandler: UserHandler;
+    private readonly userHandler: UserHandler;
 
-    constructor(userHandler: UserHandler) {
+    constructor() {
         this.router = Router();
-        this.userHandler = userHandler;
+        this.userHandler = new UserHandler();
         this.setupRoutes();
     }
 
@@ -17,25 +18,21 @@ export class UserRoutes {
     }
 
     private setupRoutes(): void {
-        this.router.get('/current', (req: Request, res: Response) => this.getCurrentUser(req, res));
-        // this.router.get('/:ip/status', (req: Request, res: Response) => this.getHostStatus(req, res));
-        // this.router.get('/:ip', (req: Request, res: Response) => this.getHost(req, res));
-        //
+        this.router.get('/current', jwtMiddleware, (req: Request, res: Response) => this.getCurrentUser(req, res));
+
         this.router.post('', (req: Request, res: Response) => this.addUser(req, res));
         this.router.post('/authenticate', (req: Request, res: Response) => this.authenticateUser(req, res));
-        //
-        // this.router.delete('/:ip', (req: Request, res: Response) => this.removeHost(req, res));
     }
 
     private getCurrentUser(req: Request, res: Response): void {
-        // const ip = req.params.ip;
-        //
-        // this.hostHandler.getHost(ip)
-        //     .then(host => {
-        res.status(401).json({});
-        //     }).catch(error => {
-        //     res.status(404).json({error: error});
-        // });
+        const decoded = req.body.decoded;
+
+        this.userHandler.getUser(decoded.username)
+            .then(currentUser => {
+                res.json(currentUser);
+            }).catch(error => {
+            res.status(404).json({error: error});
+        });
     }
 
     private addUser(req: Request, res: Response): void {
@@ -53,8 +50,8 @@ export class UserRoutes {
         const {username, password} = req.body;
 
         this.userHandler.authenticateUser(username, password)
-            .then(authenticatedUser => {
-                res.json(authenticatedUser);
+            .then(result => {
+                res.json(result);
             }).catch(error => {
             res.status(404).json({error: error});
         });

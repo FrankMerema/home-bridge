@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express';
-import { HostHandler } from '../handlers/host-handler';
+import { HostHandler } from '../../handlers/host-handler';
 
-export class HostRoutes {
+export class ClientHostRoutes {
 
     private readonly router: Router;
     private hostHandler: HostHandler;
@@ -20,9 +20,6 @@ export class HostRoutes {
         this.router.get('/all', (req: Request, res: Response) => this.getAllHosts(req, res));
         this.router.get('/:ip/status', (req: Request, res: Response) => this.getHostStatus(req, res));
         this.router.get('/:ip', (req: Request, res: Response) => this.getHost(req, res));
-
-        this.router.post('', (req: Request, res: Response) => this.addHost(req, res));
-        this.router.post('/:ip/status', (req: Request, res: Response) => this.updateHostStatus(req, res));
 
         this.router.delete('/:ip', (req: Request, res: Response) => this.removeHost(req, res));
     }
@@ -49,33 +46,10 @@ export class HostRoutes {
         });
     }
 
-    private updateHostStatus(req: Request, res: Response): void {
-        const ip = req.params.ip;
-        const status = req.body.status;
-
-        this.hostHandler.updateHostStatus(ip, status)
-            .then(() => {
-                res.json();
-            }).catch(error => {
-            res.status(404).json({error: error});
-        });
-    }
-
     private getAllHosts(req: Request, res: Response): void {
         this.hostHandler.getAllHosts()
             .then(hosts => {
                 res.json(hosts);
-            }).catch(error => {
-            res.status(404).json({error: error});
-        });
-    }
-
-    private addHost(req: Request, res: Response): void {
-        const {hostName, name, ip, port} = req.body;
-
-        this.hostHandler.addHost(hostName, name, ip, port)
-            .then(addedHost => {
-                res.json(addedHost);
             }).catch(error => {
             res.status(404).json({error: error});
         });

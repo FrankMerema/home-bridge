@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express';
-import { SensorHandler } from '../handlers/sensor-handler';
+import { SensorHandler } from '../../handlers/sensor-handler';
 
-export class SensorRoutes {
+export class ClientSensorRoutes {
 
     private readonly router: Router;
     private sensorHandler: SensorHandler;
@@ -23,7 +23,6 @@ export class SensorRoutes {
         this.router.post('', (req: Request, res: Response) => this.addSensor(req, res));
 
         this.router.put('/:id/target/:targetId', (req: Request, res: Response) => this.addTarget(req, res));
-        this.router.put('/:hostId/:pin', (req: Request, res: Response) => this.updateState(req, res));
 
         this.router.delete('/:id', (req: Request, res: Response) => this.removeSensor(req, res));
     }
@@ -47,18 +46,6 @@ export class SensorRoutes {
                 res.json({status: status});
             }).catch(error => {
             res.status(404).json({error: error});
-        });
-    }
-
-    private updateState(req: Request, res: Response): void {
-        const {hostId, pin} = req.params;
-        const newState = req.body.state;
-
-        this.sensorHandler.changeState(hostId, pin, newState)
-            .then(() => {
-                res.json({});
-            }).catch(error => {
-            res.status(404).json(error);
         });
     }
 

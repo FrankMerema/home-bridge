@@ -1,12 +1,8 @@
-import { Request, Response } from 'express';
-import { HostHandler } from './handlers/host-handler';
-import { SensorHandler } from './handlers/sensor-handler';
-import { SwitchHandler } from './handlers/switch-handler';
-import { UserHandler } from './handlers/user-handler';
-import { UserRoutes } from './routes/authentication/user-routes';
-import { HostRoutes } from './routes/host-routes';
-import { SensorRoutes } from './routes/sensor-routes';
-import { SwitchRoutes } from './routes/switch-routes';
+import { Routes } from './routes/routes';
+import cookieParser = require('cookie-parser');
+import RateLimit = require('express-rate-limit');
+import session = require('express-session');
+import helmet = require('helmet');
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -17,30 +13,22 @@ const config = require('../service.config.json');
 export function start() {
     const port = config.serverPort || 8080;
 
+    const limiter = new RateLimit({
+        windowMs: 15 * 60 * 1000, // 15 minutes
+        max: 100, // limit each IP to 100 requests per windowMs
+        delayMs: 0 // disable delaying - full speed until the max limit is reached
+    });
+
+    app.use(helmet());
+    app.use(limiter);
+
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({extended: false}));
 
-    const hostHandler = new HostHandler();
-    const switchHandler = new SwitchHandler();
-    const userHandler = new UserHandler();
+    app.use(cookieParser());
+    app.use(session({secret: config.applicationSecret}));
 
-    app.use('/api/user', new UserRoutes(userHandler).getRouter());
-
-    app.use('/api/host', new HostRoutes(hostHandler).getRouter());
-    app.use('/api/switch', new SwitchRoutes(switchHandler).getRouter());
-
-    switchHandler.initialize()
-        .then(() => {
-            const sensorHandler = new SensorHandler(switchHandler);
-            app.use('/api/sensor', new SensorRoutes(sensorHandler).getRouter());
-        });
-
-    // app.use('/api/tahoma', new TahomaRoutes(plugin.host, plugin.port).getRouter());
-
-    app.get('/api/status', (req: Request, res: Response) => {
-        res.json({status: 'OK'});
-    });
-
+    app.use('/api', new Routes().getRouter());
 
     app.listen(port, () => {
         console.log(`Express app listening on port ${port}!`);

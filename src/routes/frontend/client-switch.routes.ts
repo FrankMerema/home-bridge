@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express';
-import { SwitchHandler } from '../handlers/switch-handler';
+import { SwitchHandler } from '../../handlers/switch-handler';
 
-export class SwitchRoutes {
+export class ClientSwitchRoutes {
 
     private readonly router: Router;
     private switchHandler: SwitchHandler;
