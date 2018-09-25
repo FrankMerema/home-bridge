@@ -1,19 +1,18 @@
-import { Document, Schema } from 'mongoose';
+import {Document, Schema} from 'mongoose';
 
 export interface UserModel extends Document {
     username: string;
     password: string;
-    jwt?: string;
 }
 
 export const UserSchema = new Schema({
         username: {
             type: String,
-            required: true,
+            required: true
         },
         password: {
             type: String,
-            required: true,
+            required: true
         }
     },
     {

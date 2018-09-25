@@ -1,6 +1,6 @@
-import { Request, Response, Router } from 'express';
-import { UserHandler } from '../../handlers/user-handler';
-import { jwtMiddleware } from '../../middleware/jwt-verifier.middleware';
+import {Request, Response, Router} from 'express';
+import {UserHandler} from '../../handlers/user-handler';
+import {jwtMiddleware} from '../../middleware/jwt-verifier.middleware';
 
 export class ClientUserRoutes {
 
@@ -20,8 +20,8 @@ export class ClientUserRoutes {
     private setupRoutes(): void {
         this.router.get('/current', jwtMiddleware, (req: Request, res: Response) => this.getCurrentUser(req, res));
 
-        this.router.post('', (req: Request, res: Response) => this.addUser(req, res));
         this.router.post('/authenticate', (req: Request, res: Response) => this.authenticateUser(req, res));
+        this.router.post('', (req: Request, res: Response) => this.addUser(req, res));
     }
 
     private getCurrentUser(req: Request, res: Response): void {
@@ -51,9 +51,10 @@ export class ClientUserRoutes {
 
         this.userHandler.authenticateUser(username, password)
             .then(result => {
-                res.json(result);
+                res.cookie('SESSIONID', result.token, {httpOnly: true});
+                res.json(result.user);
             }).catch(error => {
-            res.status(404).json({error: error});
+            res.status(401).json(error);
         });
     }
 }

@@ -20,7 +20,7 @@ export class UserHandler {
         return this.userCollection.findOne({username: username});
     }
 
-    addUser(username: string, password: string): Promise<UserModel> {
+    addUser(username: string, password: string): Promise<{ user: UserModel, token: string }> {
         if (!username || !password) {
             return Promise.reject('Username and password are required!');
         }
@@ -29,10 +29,12 @@ export class UserHandler {
             .then(user => {
                 if (!user) {
                     return hash(password, 12).then(encryptedPassword => {
-                        return this.userCollection.save(<UserModel>{
-                            username: username,
-                            password: encryptedPassword,
-                        });
+                        return this.userCollection.save(<UserModel>{username: username, password: encryptedPassword})
+                            .then(user => {
+                                return Promise.resolve({user: user, token: this.createJWT(user)});
+                            }).catch(error => {
+                                throw(error);
+                            });
                     });
                 } else {
                     return Promise.reject('User already exists');
@@ -54,14 +56,13 @@ export class UserHandler {
                         if (success) {
                             return Promise.resolve({user: user, token: this.createJWT(user)});
                         } else {
-                            return Promise.reject({error: 'Username / Password incorrect'});
+                            return Promise.reject('Username / Password incorrect');
                         }
                     });
                 } else {
-                    return Promise.reject({error: 'Username / Password incorrect'});
+                    return Promise.reject('Username / Password incorrect');
                 }
             }).catch(error => {
-                console.log(error);
                 throw({error: error});
             });
     }
