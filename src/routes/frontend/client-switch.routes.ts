@@ -1,5 +1,5 @@
-import { Request, Response, Router } from 'express';
-import { SwitchHandler } from '../../handlers/switch-handler';
+import {Request, Response, Router} from 'express';
+import {SwitchHandler} from '../../handlers/switch-handler';
 
 export class ClientSwitchRoutes {
 
@@ -33,7 +33,7 @@ export class ClientSwitchRoutes {
             .then(switches => {
                 res.json(switches);
             }).catch(error => {
-            res.status(404).json({error: error});
+            res.status(404).json(error);
         });
     }
 
@@ -44,7 +44,7 @@ export class ClientSwitchRoutes {
             .then(status => {
                 res.json({status: status});
             }).catch(error => {
-            res.status(404).json({error: error});
+            res.status(404).json(error);
         });
     }
 
@@ -77,7 +77,7 @@ export class ClientSwitchRoutes {
             .then(() => {
                 res.status(200).json({});
             }).catch(error => {
-            res.status(404).json({error: error});
+            res.status(404).json(error);
         });
     }
 }

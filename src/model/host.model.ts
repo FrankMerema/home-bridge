@@ -1,4 +1,4 @@
-import { Document, Schema } from 'mongoose';
+import {Document, Schema} from 'mongoose';
 
 export type HostStatus = 'online' | 'offline';
 
@@ -16,7 +16,7 @@ export const HostSchema = new Schema({
         hostName: String,
         ip: String,
         port: Number,
-        status: String,
+        status: String
     },
     {
         timestamps: {createdAt: 'created', updatedAt: false}
@@ -27,7 +27,7 @@ export const HostDto = {
     name: true,
     hostName: true,
     status: true,
-    _id: false,
+    _id: false
 };
 
 HostSchema.set('toJSON', {

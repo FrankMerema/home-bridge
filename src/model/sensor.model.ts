@@ -1,4 +1,4 @@
-import { Document, Schema } from 'mongoose';
+import {Document, Schema} from 'mongoose';
 
 export interface SensorModel extends Document {
     created: Date;
@@ -12,7 +12,7 @@ export const SensorSchema = new Schema({
         host: {type: Schema.Types.ObjectId, ref: 'host'},
         name: String,
         pin: Number,
-        targetId: {type: Schema.Types.ObjectId, ref: 'switch'},
+        targetId: {type: Schema.Types.ObjectId, ref: 'switch'}
     },
     {
         timestamps: {createdAt: 'created', updatedAt: false}

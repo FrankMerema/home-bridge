@@ -1,5 +1,5 @@
-import { Request, Response, Router } from 'express';
-import { HostHandler } from '../../handlers/host-handler';
+import {Request, Response, Router} from 'express';
+import {HostHandler} from '../../handlers/host-handler';
 
 export class ClientHostRoutes {
 
@@ -31,7 +31,7 @@ export class ClientHostRoutes {
             .then(host => {
                 res.json(host);
             }).catch(error => {
-            res.status(404).json({error: error});
+            res.status(404).json(error);
         });
     }
 
@@ -42,7 +42,7 @@ export class ClientHostRoutes {
             .then(status => {
                 res.json(status);
             }).catch(err => {
-            res.status(404).json({error: err});
+            res.status(404).json(err);
         });
     }
 
@@ -51,7 +51,7 @@ export class ClientHostRoutes {
             .then(hosts => {
                 res.json(hosts);
             }).catch(error => {
-            res.status(404).json({error: error});
+            res.status(404).json(error);
         });
     }
 
@@ -62,7 +62,7 @@ export class ClientHostRoutes {
             .then(() => {
                 res.json();
             }).catch(error => {
-            res.status(404).json({error: error});
+            res.status(404).json(error);
         });
     }
 }

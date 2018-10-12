@@ -1,6 +1,6 @@
-import { Document, Schema } from 'mongoose';
-import { StateHistory } from './state-history.model';
-import { State } from './state.enum';
+import {Document, Schema} from 'mongoose';
+import {StateHistory} from './state-history.model';
+import {State} from './state.enum';
 
 export interface SwitchModel extends Document {
     created: Date;
@@ -16,7 +16,7 @@ export const SwitchSchema = new Schema({
         name: String,
         pin: Number,
         state: Number,
-        stateHistory: {type: Array, default: []},
+        stateHistory: {type: Array, default: []}
     },
     {
         timestamps: {createdAt: 'created', updatedAt: false}

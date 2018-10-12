@@ -37,7 +37,7 @@ export class SwitchHandler {
 
     addSwitch(pin: number, hostId: string, name: string): Promise<SwitchModel> {
         if (!pin || !hostId || !name) {
-            return Promise.reject({error: 'Should set pin, host and name!'});
+            return Promise.reject('Should set pin, host and name!');
         }
 
         return this.hostCollection.findOne({_id: hostId})
@@ -118,7 +118,7 @@ export class SwitchHandler {
                             throw(error.response && error.response.data ? error.response.data : error);
                         });
                 } else {
-                    return Promise.reject({error: `Switch not found for ID: ${switchId}`});
+                    return Promise.reject(`Switch not found for ID: ${switchId}`);
                 }
             });
     }

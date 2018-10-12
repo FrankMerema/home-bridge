@@ -1,4 +1,4 @@
-import { Routes } from './routes/routes';
+import {Routes} from './routes/routes';
 import cookieParser = require('cookie-parser');
 import RateLimit = require('express-rate-limit');
 import session = require('express-session');

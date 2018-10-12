@@ -63,7 +63,7 @@ export class UserHandler {
                     return Promise.reject('Username / Password incorrect');
                 }
             }).catch(error => {
-                throw({error: error});
+                throw(error);
             });
     }
 

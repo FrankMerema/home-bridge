@@ -1,5 +1,5 @@
-import { Request, Response, Router } from 'express';
-import { SensorHandler } from '../../handlers/sensor-handler';
+import {Request, Response, Router} from 'express';
+import {SensorHandler} from '../../handlers/sensor-handler';
 
 export class ServerSensorRoutes {
 
@@ -29,7 +29,7 @@ export class ServerSensorRoutes {
             .then(sensors => {
                 res.json(sensors);
             }).catch(error => {
-            res.status(404).json({error: error});
+            res.status(404).json(error);
         });
     }
 

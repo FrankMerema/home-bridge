@@ -1,6 +1,6 @@
-import { Request, Response, Router } from 'express';
-import { UserHandler } from '../../handlers/user-handler';
-import { jwtMiddleware } from '../../middleware/jwt-verifier.middleware';
+import {Request, Response, Router} from 'express';
+import {UserHandler} from '../../handlers/user-handler';
+import {jwtMiddleware} from '../../middleware/jwt-verifier.middleware';
 
 export class ClientUserRoutes {
 
@@ -32,7 +32,7 @@ export class ClientUserRoutes {
             .then(currentUser => {
                 res.json(currentUser);
             }).catch(error => {
-            res.status(404).json({error: error});
+            res.status(404).json(error);
         });
     }
 
@@ -43,7 +43,7 @@ export class ClientUserRoutes {
             .then(addedUser => {
                 res.json(addedUser);
             }).catch(error => {
-            res.status(404).json({error: error});
+            res.status(404).json(error);
         });
     }
 

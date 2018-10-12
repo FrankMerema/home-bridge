@@ -61,7 +61,7 @@ export class SensorHandler {
 
     addSensor(pin: number, hostId: string, name: string, targetId?: string): Promise<SensorModel> {
         if (!pin || !hostId || !name) {
-            return Promise.reject({error: 'Should set pin, hostId and name!'});
+            return Promise.reject('Should set pin, hostId and name!');
         }
 
         return this.hostCollection.findOne({_id: hostId})
