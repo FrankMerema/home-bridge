@@ -1,7 +1,6 @@
 import { Collection, Database } from 'abstract-database';
-import axios from 'axios';
 import { from, Observable, throwError } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { catchError, mergeMap, switchMap } from 'rxjs/operators';
 import { hbAxios } from '../helpers/axios-observable';
 import { HostModel, HostSchema } from '../model/host.model';
 import { State } from '../model/state.enum';
@@ -25,80 +24,72 @@ export class SwitchHandler {
         this.hostCollection = new Collection<HostModel>(connection, 'host', HostSchema, 'hosts');
     }
 
-    initialize(): Promise<any> {
-        return this.switchCollection.find({})
-            .then(allSwitches => {
-                return Promise.all(allSwitches.map(sw => {
-                    return this.getSwitchState(sw._id)
-                        .catch(error => {
-                            if (error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
-                                console.error(`Host ${error.address} appears to be offline, so getting state for ${sw.name} has failed`);
-                            } else {
-                                console.error(error);
-                            }
-                        });
-                }));
-            });
+    initialize(): Observable<{} | SwitchModel> {
+        return from(this.switchCollection.find({}))
+            .pipe(mergeMap(allSwitches => {
+                return allSwitches.map(sw => this.getSwitchState(sw._id)
+                    .pipe(catchError(error => {
+                        if (error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
+                            console.error(`Host ${error.address} appears to be offline, so getting state for ${sw.name} has failed`);
+                        } else {
+                            console.error(error);
+                        }
+
+                        return error;
+                    })));
+            }));
     }
 
-    addSwitch(pin: number, hostId: string, name: string): Promise<SwitchModel> {
+    addSwitch(pin: number, hostId: string, name: string): Observable<{} | SwitchModel> {
         if (!pin || !hostId || !name) {
-            return Promise.reject('Should set pin, host and name!');
+            return throwError('Should set pin, host and name!');
         }
 
-        return this.hostCollection.findOne({_id: hostId})
-            .then(h => {
-                return axios.post<SwitchModel>(`http://${h.ip}:${h.port}/api/switch`, {pin: pin})
-                    .then((createdSwitch) => {
-                        const newSwitch = createdSwitch.data;
-                        newSwitch.host = h._id;
-                        newSwitch.name = name;
+        return from(this.hostCollection.findOne({_id: hostId}))
+            .pipe(switchMap(host => {
+                return hbAxios.post<SwitchModel>(`http://${host.ip}:${host.port}/api/switch`, {pin: pin})
+                    .pipe(switchMap(createdSwitch => {
+                            const newSwitch = createdSwitch.data;
+                            newSwitch.host = host._id;
+                            newSwitch.name = name;
 
-                        return this.switchCollection
-                            .findOneAndUpdate({pin: pin, host: h._id}, newSwitch, {upsert: true, new: true});
-                    }).catch(error => {
-                        throw(error.response && error.response.data ? error.response.data : error);
-                    });
-            }).catch(error => {
-                throw(error);
-            });
+                            return from(this.switchCollection
+                                .findOneAndUpdate({pin: pin, host: host._id}, newSwitch, {upsert: true, new: true}));
+                        }),
+                        catchError(error => error.response && error.response.data ? error.response.data : error));
+            }));
     }
 
-    removeSwitch(switchId: string): Promise<any> {
-        return this.switchCollection.findOneAndRemove({_id: switchId})
-            .then((deletedSwitch) => {
-                return this.hostCollection.findOne({_id: deletedSwitch.host})
-                    .then(host => {
-                        return axios.delete(`http://${host.ip}:${host.port}/api/switch/${deletedSwitch.pin}`)
-                            .catch(error => {
-                                throw(error.response && error.response.data ? error.response.data : error);
-                            });
-                    }).catch(error => {
-                        throw(error);
-                    });
-            });
+    removeSwitch(switchId: string): Observable<any> {
+        return from(this.switchCollection.findOneAndRemove({_id: switchId}))
+            .pipe(switchMap(deletedSwitch => {
+                return from(this.hostCollection.findOne({_id: deletedSwitch.host}))
+                    .pipe(switchMap(host => {
+                        return hbAxios.delete(`http://${host.ip}:${host.port}/api/switch/${deletedSwitch.pin}`)
+                            .pipe(catchError(error => error.response && error.response.data ? error.response.data : error));
+                    }));
+            }));
     }
 
-    getSwitches(hostId: string): Promise<Array<SwitchModel>> {
-        return this.switchCollection.find({}, null, {
+    getSwitches(hostId: string): Observable<Array<SwitchModel>> {
+        return from(this.switchCollection.find({}, null, {
             path: 'host',
             select: 'created _id hostName status',
             match: {_id: hostId}
-        });
+        }));
     }
 
-    getSwitchState(switchId: string): Promise<SwitchModel> {
-        return this.switchCollection.findOne({_id: switchId}, null, {path: 'host'})
-            .then(foundSwitch => {
-                return axios.get(`http://${foundSwitch.host.ip}:${foundSwitch.host.port}/api/switch/state/${foundSwitch.pin}`)
-                    .then(response => {
-                        foundSwitch.state = response.data.state;
+    getSwitchState(switchId: string): Observable<{} | SwitchModel> {
+        return from(this.switchCollection.findOne({_id: switchId}, null, {path: 'host'}))
+            .pipe(switchMap(foundSwitch => {
+                return hbAxios.get(`http://${foundSwitch.host.ip}:${foundSwitch.host.port}/api/switch/state/${foundSwitch.pin}`)
+                    .pipe(switchMap(response => {
+                            foundSwitch.state = response.data.state;
 
-                        return this.switchCollection.save(foundSwitch);
-                    }).catch(error => {
-                        throw(error.response && error.response.data ? error.response.data : error);
-                    });
-            });
+                            return from(this.switchCollection.save(foundSwitch));
+                        }),
+                        catchError(error => error.response && error.response.data ? error.response.data : error));
+            }));
     }
 
     changeState(switchId: string, state?: State): Observable<SwitchModel> {

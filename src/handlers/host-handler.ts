@@ -1,4 +1,5 @@
 import { Collection, Database } from 'abstract-database';
+import { from, Observable, throwError } from 'rxjs';
 import { hbAxios } from '../helpers/axios-observable';
 import { HostDto, HostModel, HostSchema, HostStatus } from '../model/host.model';
 
@@ -17,8 +18,8 @@ export class HostHandler {
 
         this.hostCollection = new Collection<HostModel>(connection, 'host', HostSchema, 'hosts');
 
-        this.hostCollection.find({})
-            .then(hosts => {
+        from(this.hostCollection.find({}))
+            .subscribe(hosts => {
                 hosts.forEach(host => {
                     hbAxios.get(`http://${host.ip}:${host.port}/api/status`)
                         .subscribe(() => {
@@ -31,35 +32,35 @@ export class HostHandler {
             });
     }
 
-    getHost(id: string): Promise<HostModel> {
-        return this.hostCollection.aggregateOne({_id: id}, HostDto);
+    getHost(id: string): Observable<HostModel> {
+        return from(this.hostCollection.aggregateOne({_id: id}, HostDto));
     }
 
-    getHostStatus(id: string): Promise<HostModel> {
-        return this.hostCollection.findOne({_id: id}, {status: true});
+    getHostStatus(id: string): Observable<HostModel> {
+        return from(this.hostCollection.findOne({_id: id}, {status: true}));
     }
 
-    getAllHosts(): Promise<Array<HostModel>> {
-        return this.hostCollection.aggregate({}, HostDto);
+    getAllHosts(): Observable<Array<HostModel>> {
+        return from(this.hostCollection.aggregate({}, HostDto));
     }
 
-    addHost(hostName: string, name: string, ip: string, port: number): Promise<HostModel> {
+    addHost(hostName: string, name: string, ip: string, port: number): Observable<HostModel> {
         if (!hostName || !name || !ip || !port) {
-            return Promise.reject('Should set hostName, name, ip and port!');
+            return throwError('Should set hostName, name, ip and port!');
         }
 
         const newHost = <HostModel>{hostName: hostName, name: name, ip: ip, port: port, status: 'online'};
         console.info(`New host added: ${newHost.name}`);
 
-        return this.hostCollection.findOneAndUpdate({ip: ip}, newHost, {upsert: true, new: true});
+        return from(this.hostCollection.findOneAndUpdate({ip: ip}, newHost, {upsert: true, new: true}));
     }
 
-    removeHost(id: string): Promise<any> {
+    removeHost(id: string): Observable<HostModel> {
         console.info(`Removing host with ip: ${id}`);
-        return this.hostCollection.findOneAndRemove({_id: id});
+        return from(this.hostCollection.findOneAndRemove({_id: id}));
     }
 
-    updateHostStatus(ip: string, status: HostStatus) {
-        return this.hostCollection.findOneAndUpdate({ip: ip}, {status: status});
+    updateHostStatus(ip: string, status: HostStatus): Observable<HostModel> {
+        return from(this.hostCollection.findOneAndUpdate({ip: ip}, {status: status}));
     }
 }
