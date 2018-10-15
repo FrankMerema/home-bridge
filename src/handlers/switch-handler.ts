@@ -1,5 +1,8 @@
-import { Collection, MongoAtlasDatabase } from 'abstract-database';
+import { Collection, Database } from 'abstract-database';
 import axios from 'axios';
+import { from, Observable, throwError } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+import { hbAxios } from '../helpers/axios-observable';
 import { HostModel, HostSchema } from '../model/host.model';
 import { State } from '../model/state.enum';
 import { SwitchModel, SwitchSchema } from '../model/switch.model';
@@ -12,8 +15,11 @@ export class SwitchHandler {
     private hostCollection: Collection<HostModel>;
 
     constructor() {
-        const connection = new MongoAtlasDatabase(config.database.username, config.database.password,
-            config.database.host, config.database.name, config.database.config).getConnection();
+        const connection = new Database('localhost', 27017,
+            config.database.name, config.database.config).getConnection();
+
+        // const connection = new MongoAtlasDatabase(config.database.username, config.database.password,
+        //     config.database.host, config.database.name, config.database.config).getConnection();
 
         this.switchCollection = new Collection<SwitchModel>(connection, 'switch', SwitchSchema, 'switches');
         this.hostCollection = new Collection<HostModel>(connection, 'host', HostSchema, 'hosts');
@@ -95,17 +101,18 @@ export class SwitchHandler {
             });
     }
 
-    changeState(switchId: string, state?: State): Promise<SwitchModel> {
-        return this.switchCollection.findOne({_id: switchId}, null, {path: 'host'})
-            .then(foundSwitch => {
+    changeState(switchId: string, state?: State): Observable<SwitchModel> {
+        return from(this.switchCollection.findOne({_id: switchId}, null, {path: 'host'}))
+            .pipe(switchMap(foundSwitch => {
                 if (foundSwitch) {
                     const newState = {
                         state: state !== undefined ? state :
                             foundSwitch.state === State.ON ?
                                 State.OFF : State.ON
                     };
-                    return axios.post(`http://${foundSwitch.host.ip}:${foundSwitch.host.port}/api/switch/state/${foundSwitch.pin}`, newState)
-                        .then(() => {
+
+                    return hbAxios.post(`http://${foundSwitch.host.ip}:${foundSwitch.host.port}/api/switch/state/${foundSwitch.pin}`, newState)
+                        .pipe(switchMap(() => {
                             foundSwitch.state = newState.state;
                             foundSwitch.stateHistory.push({
                                 state: newState.state,
@@ -113,13 +120,11 @@ export class SwitchHandler {
                                 executedBy: 'system'
                             });
 
-                            return this.switchCollection.save(foundSwitch);
-                        }).catch(error => {
-                            throw(error.response && error.response.data ? error.response.data : error);
-                        });
+                            return from(this.switchCollection.save(foundSwitch));
+                        }));
                 } else {
-                    return Promise.reject(`Switch not found for ID: ${switchId}`);
+                    return throwError(`Switch not found for ID: ${switchId}`);
                 }
-            });
+            }));
     }
 }

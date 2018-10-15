@@ -1,7 +1,7 @@
-import { Collection, MongoAtlasDatabase } from 'abstract-database';
-import { compare, hash } from 'bcrypt';
-import { sign } from 'jsonwebtoken';
-import { UserModel, UserSchema } from '../model/user.model';
+import {Collection, Database} from 'abstract-database';
+import {compare, hash} from 'bcrypt';
+import {sign} from 'jsonwebtoken';
+import {UserModel, UserSchema} from '../model/user.model';
 
 const config = require('../../service.config.json');
 
@@ -10,8 +10,11 @@ export class UserHandler {
     private userCollection: Collection<UserModel>;
 
     constructor() {
-        const connection = new MongoAtlasDatabase(config.database.username, config.database.password,
-            config.database.host, config.database.name, config.database.config).getConnection();
+        const connection = new Database('localhost', 27017,
+            config.database.name, config.database.config).getConnection();
+
+        // const connection = new MongoAtlasDatabase(config.database.username, config.database.password,
+        //     config.database.host, config.database.name, config.database.config).getConnection();
 
         this.userCollection = new Collection<UserModel>(connection, 'user', UserSchema, 'users');
     }

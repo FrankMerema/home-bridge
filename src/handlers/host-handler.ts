@@ -1,5 +1,5 @@
-import { Collection, MongoAtlasDatabase } from 'abstract-database';
-import axios from 'axios';
+import { Collection, Database } from 'abstract-database';
+import { hbAxios } from '../helpers/axios-observable';
 import { HostDto, HostModel, HostSchema, HostStatus } from '../model/host.model';
 
 const config = require('../../service.config.json');
@@ -9,21 +9,24 @@ export class HostHandler {
     private hostCollection: Collection<HostModel>;
 
     constructor() {
-        const connection = new MongoAtlasDatabase(config.database.username, config.database.password,
-            config.database.host, config.database.name, config.database.config).getConnection();
+        const connection = new Database('localhost', 27017,
+            config.database.name, config.database.config).getConnection();
+
+        // const connection = new MongoAtlasDatabase(config.database.username, config.database.password,
+        //     config.database.host, config.database.name, config.database.config).getConnection();
 
         this.hostCollection = new Collection<HostModel>(connection, 'host', HostSchema, 'hosts');
 
         this.hostCollection.find({})
             .then(hosts => {
                 hosts.forEach(host => {
-                    axios.get(`http://${host.ip}:${host.port}/api/status`)
-                        .then(() => {
+                    hbAxios.get(`http://${host.ip}:${host.port}/api/status`)
+                        .subscribe(() => {
                             this.updateHostStatus(host.ip, 'online');
-                        }).catch(() => {
-                        this.updateHostStatus(host.ip, 'offline');
-                        console.error(`${host.hostName} didn't respond so set to 'offline'`);
-                    });
+                        }, () => {
+                            this.updateHostStatus(host.ip, 'offline');
+                            console.error(`${host.hostName} didn't respond so set to 'offline'`);
+                        });
                 });
             });
     }
