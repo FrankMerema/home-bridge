@@ -22,7 +22,7 @@ export class ClientUserRoutes {
 
         this.router.post('/logout', (req: Request, res: Response) => this.logout(req, res));
         this.router.post('/authenticate', (req: Request, res: Response) => this.authenticateUser(req, res));
-        this.router.post('', (req: Request, res: Response) => this.addUser(req, res));
+        this.router.post('', jwtMiddleware, (req: Request, res: Response) => this.addUser(req, res));
     }
 
     private getCurrentUser(req: Request, res: Response): void {
