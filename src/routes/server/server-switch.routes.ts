@@ -1,5 +1,5 @@
-import {Request, Response, Router} from 'express';
-import {SwitchHandler} from '../../handlers/switch-handler';
+import { Request, Response, Router } from 'express';
+import { SwitchHandler } from '../../handlers/switch-handler';
 
 export class ServerSwitchRoutes {
 
@@ -24,10 +24,10 @@ export class ServerSwitchRoutes {
         const hostId = req.params.hostId;
 
         this.switchHandler.getSwitches(hostId)
-            .then(switches => {
+            .subscribe(switches => {
                 res.json(switches);
-            }).catch(error => {
-            res.status(404).json(error);
-        });
+            }, error => {
+                res.status(404).json(error);
+            });
     }
 }

@@ -1,5 +1,5 @@
-import {Request, Response, Router} from 'express';
-import {SensorHandler} from '../../handlers/sensor-handler';
+import { Request, Response, Router } from 'express';
+import { SensorHandler } from '../../handlers/sensor-handler';
 
 export class ServerSensorRoutes {
 
@@ -26,11 +26,11 @@ export class ServerSensorRoutes {
         const hostId = req.params.hostId;
 
         this.sensorHandler.getSensors(hostId)
-            .then(sensors => {
+            .subscribe(sensors => {
                 res.json(sensors);
-            }).catch(error => {
-            res.status(404).json(error);
-        });
+            }, error => {
+                res.status(404).json(error);
+            });
     }
 
     private updateState(req: Request, res: Response): void {
@@ -38,10 +38,10 @@ export class ServerSensorRoutes {
         const newState = req.body.state;
 
         this.sensorHandler.changeState(hostId, pin, newState)
-            .then(() => {
+            .subscribe(() => {
                 res.json({});
-            }).catch(error => {
-            res.status(404).json(error);
-        });
+            }, error => {
+                res.status(404).json(error);
+            });
     }
 }

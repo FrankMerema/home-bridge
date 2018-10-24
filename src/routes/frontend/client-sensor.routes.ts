@@ -1,5 +1,5 @@
-import {Request, Response, Router} from 'express';
-import {SensorHandler} from '../../handlers/sensor-handler';
+import { Request, Response, Router } from 'express';
+import { SensorHandler } from '../../handlers/sensor-handler';
 
 export class ClientSensorRoutes {
 
@@ -31,54 +31,54 @@ export class ClientSensorRoutes {
         const hostId = req.params.hostId;
 
         this.sensorHandler.getSensors(hostId)
-            .then(sensors => {
+            .subscribe(sensors => {
                 res.json(sensors);
-            }).catch(error => {
-            res.status(404).json(error);
-        });
+            }, error => {
+                res.status(404).json(error);
+            });
     }
 
     private getState(req: Request, res: Response): void {
         const sensorId = req.params.id;
 
         this.sensorHandler.getSensorState(sensorId)
-            .then(status => {
+            .subscribe(status => {
                 res.json({status: status});
-            }).catch(error => {
-            res.status(404).json(error);
-        });
+            }, error => {
+                res.status(404).json(error);
+            });
     }
 
     private addTarget(req: Request, res: Response): void {
         const {sensorId, targetId} = req.params;
 
         this.sensorHandler.addTarget(sensorId, targetId)
-            .then(s => {
+            .subscribe(s => {
                 res.json(s);
-            }).catch(error => {
-            res.status(404).json(error);
-        });
+            }, error => {
+                res.status(404).json(error);
+            });
     }
 
     private addSensor(req: Request, res: Response): void {
         const {pin, hostId, name, targetId} = req.body;
 
         this.sensorHandler.addSensor(pin, hostId, name, targetId)
-            .then(s => {
+            .subscribe(s => {
                 res.json(s);
-            }).catch(error => {
-            res.status(404).json(error);
-        });
+            }, error => {
+                res.status(404).json(error);
+            });
     }
 
     private removeSensor(req: Request, res: Response): void {
         const sensorId = req.params.id;
 
         this.sensorHandler.removeSensor(sensorId)
-            .then(() => {
+            .subscribe(() => {
                 res.status(200).json({});
-            }).catch(error => {
-            res.status(404).json(error);
-        });
+            }, error => {
+                res.status(404).json(error);
+            });
     }
 }

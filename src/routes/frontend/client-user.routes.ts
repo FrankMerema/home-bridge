@@ -1,6 +1,6 @@
-import {Request, Response, Router} from 'express';
-import {UserHandler} from '../../handlers/user-handler';
-import {jwtMiddleware} from '../../middleware/jwt-verifier.middleware';
+import { Request, Response, Router } from 'express';
+import { UserHandler } from '../../handlers/user-handler';
+import { jwtMiddleware } from '../../middleware/jwt-verifier.middleware';
 
 export class ClientUserRoutes {
 
@@ -29,34 +29,35 @@ export class ClientUserRoutes {
         const decoded = req.body.decoded;
 
         this.userHandler.getUser(decoded.username)
-            .then(currentUser => {
+            .subscribe(currentUser => {
                 res.json(currentUser);
-            }).catch(error => {
-            res.status(404).json(error);
-        });
+            }, error => {
+                res.status(404).json(error);
+            });
     }
 
     private addUser(req: Request, res: Response): void {
         const {username, password} = req.body;
 
         this.userHandler.addUser(username, password)
-            .then(addedUser => {
-                res.json(addedUser);
-            }).catch(error => {
-            res.status(404).json(error);
-        });
+            .subscribe(result => {
+                res.cookie('SESSIONID', result.token, {httpOnly: true});
+                res.json(result.user);
+            }, error => {
+                res.status(404).json(error);
+            });
     }
 
     private authenticateUser(req: Request, res: Response): void {
         const {username, password} = req.body;
 
         this.userHandler.authenticateUser(username, password)
-            .then(result => {
+            .subscribe(result => {
                 res.cookie('SESSIONID', result.token, {httpOnly: true});
                 res.json(result.user);
-            }).catch(error => {
-            res.status(401).json(error);
-        });
+            }, error => {
+                res.status(401).json(error);
+            });
     }
 
     private logout(req: Request, res: Response): void {

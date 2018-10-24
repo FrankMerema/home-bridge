@@ -1,4 +1,4 @@
-import {Routes} from './routes/routes';
+import { Routes } from './routes/routes';
 import cookieParser = require('cookie-parser');
 import RateLimit = require('express-rate-limit');
 import session = require('express-session');
@@ -26,7 +26,11 @@ export function start() {
     app.use(bodyParser.urlencoded({extended: false}));
 
     app.use(cookieParser());
-    app.use(session({secret: config.applicationSecret}));
+    app.use(session({
+        secret: config.applicationSecret,
+        resave: false,
+        saveUninitialized: false
+    }));
 
     app.use('/api', new Routes().getRouter());
 

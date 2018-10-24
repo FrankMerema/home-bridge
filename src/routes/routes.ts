@@ -1,15 +1,15 @@
-import {Request, Response, Router} from 'express';
-import {HostHandler} from '../handlers/host-handler';
-import {SensorHandler} from '../handlers/sensor-handler';
-import {SwitchHandler} from '../handlers/switch-handler';
-import {jwtMiddleware} from '../middleware/jwt-verifier.middleware';
-import {ClientHostRoutes} from './frontend/client-host.routes';
-import {ClientSensorRoutes} from './frontend/client-sensor.routes';
-import {ClientSwitchRoutes} from './frontend/client-switch.routes';
-import {ClientUserRoutes} from './frontend/client-user.routes';
-import {ServerHostRoutes} from './server/server-host.routes';
-import {ServerSensorRoutes} from './server/server-sensor.routes';
-import {ServerSwitchRoutes} from './server/server-switch.routes';
+import { Request, Response, Router } from 'express';
+import { HostHandler } from '../handlers/host-handler';
+import { SensorHandler } from '../handlers/sensor-handler';
+import { SwitchHandler } from '../handlers/switch-handler';
+import { jwtMiddleware } from '../middleware/jwt-verifier.middleware';
+import { ClientHostRoutes } from './frontend/client-host.routes';
+import { ClientSensorRoutes } from './frontend/client-sensor.routes';
+import { ClientSwitchRoutes } from './frontend/client-switch.routes';
+import { ClientUserRoutes } from './frontend/client-user.routes';
+import { ServerHostRoutes } from './server/server-host.routes';
+import { ServerSensorRoutes } from './server/server-sensor.routes';
+import { ServerSwitchRoutes } from './server/server-switch.routes';
 
 export class Routes {
     private readonly router: Router;
@@ -40,7 +40,7 @@ export class Routes {
         this.router.use('/server/switch', new ServerSwitchRoutes(switchHandler).getRouter());
 
         switchHandler.initialize()
-            .then(() => {
+            .subscribe(() => {
                 const sensorHandler = new SensorHandler(switchHandler);
 
                 // CLIENT ROUTES

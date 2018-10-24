@@ -1,5 +1,5 @@
-import {Request, Response, Router} from 'express';
-import {HostHandler} from '../../handlers/host-handler';
+import { Request, Response, Router } from 'express';
+import { HostHandler } from '../../handlers/host-handler';
 
 export class ServerHostRoutes {
 
@@ -27,21 +27,21 @@ export class ServerHostRoutes {
         const status = req.body.status;
 
         this.hostHandler.updateHostStatus(ip, status)
-            .then(() => {
+            .subscribe(() => {
                 res.json();
-            }).catch(error => {
-            res.status(404).json(error);
-        });
+            }, error => {
+                res.status(404).json(error);
+            });
     }
 
     private addHost(req: Request, res: Response): void {
         const {hostName, name, ip, port} = req.body;
 
         this.hostHandler.addHost(hostName, name, ip, port)
-            .then(addedHost => {
+            .subscribe(addedHost => {
                 res.json(addedHost);
-            }).catch(error => {
-            res.status(404).json(error);
-        });
+            }, error => {
+                res.status(404).json(error);
+            });
     }
 }
