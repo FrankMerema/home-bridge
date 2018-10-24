@@ -40,7 +40,7 @@ export class Routes {
         this.router.use('/server/switch', new ServerSwitchRoutes(switchHandler).getRouter());
 
         switchHandler.initialize()
-            .then(() => {
+            .subscribe(() => {
                 const sensorHandler = new SensorHandler(switchHandler);
 
                 // CLIENT ROUTES

@@ -1,5 +1,5 @@
-import {Request, Response, Router} from 'express';
-import {SwitchHandler} from '../../handlers/switch-handler';
+import { Request, Response, Router } from 'express';
+import { SwitchHandler } from '../../handlers/switch-handler';
 
 export class ClientSwitchRoutes {
 
@@ -30,54 +30,54 @@ export class ClientSwitchRoutes {
         const hostId = req.params.hostId;
 
         this.switchHandler.getSwitches(hostId)
-            .then(switches => {
+            .subscribe(switches => {
                 res.json(switches);
-            }).catch(error => {
-            res.status(404).json(error);
-        });
+            }, error => {
+                res.status(404).json(error);
+            });
     }
 
     private getState(req: Request, res: Response): void {
         const switchId = req.params.id;
 
         this.switchHandler.getSwitchState(switchId)
-            .then(status => {
+            .subscribe(status => {
                 res.json({status: status});
-            }).catch(error => {
-            res.status(404).json(error);
-        });
+            }, error => {
+                res.status(404).json(error);
+            });
     }
 
     private changeState(req: Request, res: Response): void {
         const switchId = req.params.id;
 
         this.switchHandler.changeState(switchId)
-            .then((updatedSwitch) => {
+            .subscribe((updatedSwitch) => {
                 res.json(updatedSwitch);
-            }).catch(error => {
-            res.status(404).json(error);
-        });
+            }, error => {
+                res.status(404).json(error);
+            });
     }
 
     private addSwitch(req: Request, res: Response): void {
         const {pin, hostId, name} = req.body;
 
         this.switchHandler.addSwitch(pin, hostId, name)
-            .then(s => {
+            .subscribe(s => {
                 res.json(s);
-            }).catch(error => {
-            res.status(404).json(error);
-        });
+            }, error => {
+                res.status(404).json(error);
+            });
     }
 
     private removeSwitch(req: Request, res: Response): void {
         const switchId = req.params.id;
 
         this.switchHandler.removeSwitch(switchId)
-            .then(() => {
+            .subscribe(() => {
                 res.status(200).json({});
-            }).catch(error => {
-            res.status(404).json(error);
-        });
+            }, error => {
+                res.status(404).json(error);
+            });
     }
 }

@@ -1,5 +1,5 @@
-import {Request, Response, Router} from 'express';
-import {HostHandler} from '../../handlers/host-handler';
+import { Request, Response, Router } from 'express';
+import { HostHandler } from '../../handlers/host-handler';
 
 export class ClientHostRoutes {
 
@@ -28,41 +28,41 @@ export class ClientHostRoutes {
         const ip = req.params.ip;
 
         this.hostHandler.getHost(ip)
-            .then(host => {
+            .subscribe(host => {
                 res.json(host);
-            }).catch(error => {
-            res.status(404).json(error);
-        });
+            }, error => {
+                res.status(404).json(error);
+            });
     }
 
     private getHostStatus(req: Request, res: Response) {
         const ip = req.params.ip;
 
         this.hostHandler.getHostStatus(ip)
-            .then(status => {
+            .subscribe(status => {
                 res.json(status);
-            }).catch(err => {
-            res.status(404).json(err);
-        });
+            }, err => {
+                res.status(404).json(err);
+            });
     }
 
     private getAllHosts(req: Request, res: Response): void {
         this.hostHandler.getAllHosts()
-            .then(hosts => {
+            .subscribe(hosts => {
                 res.json(hosts);
-            }).catch(error => {
-            res.status(404).json(error);
-        });
+            }, error => {
+                res.status(404).json(error);
+            });
     }
 
     private removeHost(req: Request, res: Response): void {
         const ip = req.params.ip;
 
         this.hostHandler.removeHost(ip)
-            .then(() => {
+            .subscribe(() => {
                 res.json();
-            }).catch(error => {
-            res.status(404).json(error);
-        });
+            }, error => {
+                res.status(404).json(error);
+            });
     }
 }
