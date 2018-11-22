@@ -35,9 +35,9 @@ export class ServerHostRoutes {
     }
 
     private addHost(req: Request, res: Response): void {
-        const {hostName, name, ip, port} = req.body;
+        const {host, name, ip, port} = req.body;
 
-        this.hostHandler.addHost(hostName, name, ip, port)
+        this.hostHandler.addHost(host, name, ip, port)
             .subscribe(addedHost => {
                 res.json(addedHost);
             }, error => {

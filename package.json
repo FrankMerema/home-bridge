@@ -2,7 +2,7 @@
     "name": "home-bridge",
     "version": "0.0.2",
     "description": "The homebridge for home automation",
-    "main": "dist/server.js",
+    "main": "dist/start.js",
     "scripts": {
         "build": "tsc",
         "start": "node -r ts-node/register src/start.ts"

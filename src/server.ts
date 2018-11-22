@@ -32,7 +32,15 @@ export function start() {
         saveUninitialized: false
     }));
 
+    // Serve the Frontend
+    // app.use(express.static(path.join(__dirname, '../dist')));
+
     app.use('/api', new Routes().getRouter());
+
+    // Catch all urls not defined and serve Frontend
+    // app.get('*', (req: Request, res: Response) => {
+    //     res.sendFile(path.join(__dirname, '../dist/index.html'));
+    // });
 
     app.listen(port, () => {
         console.log(`Express app listening on port ${port}!`);

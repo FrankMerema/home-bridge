@@ -33,7 +33,7 @@ export class ClientSwitchRoutes {
             .subscribe(switches => {
                 res.json(switches);
             }, error => {
-                res.status(404).json(error);
+                res.status(400).json(error);
             });
     }
 
@@ -44,7 +44,7 @@ export class ClientSwitchRoutes {
             .subscribe(status => {
                 res.json({status: status});
             }, error => {
-                res.status(404).json(error);
+                res.status(400).json(error);
             });
     }
 
@@ -55,7 +55,7 @@ export class ClientSwitchRoutes {
             .subscribe((updatedSwitch) => {
                 res.json(updatedSwitch);
             }, error => {
-                res.status(404).json(error);
+                res.status(400).json(error);
             });
     }
 
@@ -66,7 +66,7 @@ export class ClientSwitchRoutes {
             .subscribe(s => {
                 res.json(s);
             }, error => {
-                res.status(404).json(error);
+                res.status(400).json(error);
             });
     }
 
@@ -77,7 +77,7 @@ export class ClientSwitchRoutes {
             .subscribe(() => {
                 res.status(200).json({});
             }, error => {
-                res.status(404).json(error);
+                res.status(400).json(error);
             });
     }
 }
