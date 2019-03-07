@@ -1,4 +1,6 @@
 import { Request, Response, Router } from 'express';
+import { toDataURL } from 'qrcode';
+import { generateSecret } from 'speakeasy';
 import { UserHandler } from '../../handlers/user-handler';
 import { jwtMiddleware } from '../../middleware/jwt-verifier.middleware';
 
@@ -19,6 +21,8 @@ export class ClientUserRoutes {
 
     private setupRoutes(): void {
         this.router.get('/current', jwtMiddleware, (req: Request, res: Response) => this.getCurrentUser(req, res));
+
+        this.router.post('/test', (req: Request, res: Response) => this.create2FAuth(req, res));
 
         this.router.post('/logout', (req: Request, res: Response) => this.logout(req, res));
         this.router.post('/authenticate', (req: Request, res: Response) => this.authenticateUser(req, res));
@@ -63,5 +67,13 @@ export class ClientUserRoutes {
     private logout(req: Request, res: Response): void {
         res.clearCookie('SESSIONID');
         res.json({});
+    }
+
+    private create2FAuth(req: Request, res: Response) {
+        const secret = generateSecret({name: 'Home Bridge', issuer: 'Frank Merema'});
+
+        toDataURL(secret.otpauth_url, ((error, url) => {
+            res.json(url);
+        }));
     }
 }
