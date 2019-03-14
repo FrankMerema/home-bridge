@@ -1,6 +1,4 @@
 import { Request, Response, Router } from 'express';
-import { authenticator } from 'otplib';
-import { toDataURL } from 'qrcode';
 import { UserHandler } from '../../handlers/user-handler';
 import { jwtMiddleware } from '../../middleware/jwt-verifier.middleware';
 
@@ -8,8 +6,6 @@ export class ClientUserRoutes {
 
     private readonly router: Router;
     private readonly userHandler: UserHandler;
-
-    private secret: string;
 
     constructor() {
         this.router = Router();
@@ -23,12 +19,12 @@ export class ClientUserRoutes {
 
     private setupRoutes(): void {
         this.router.get('/current', jwtMiddleware, (req: Request, res: Response) => this.getCurrentUser(req, res));
-        this.router.get('/verify2factor/:username/:token', jwtMiddleware, (req: Request, res: Response) => this.verify2FAuth(req, res));
+        this.router.get('/verify2factor/:username/:code', jwtMiddleware, (req: Request, res: Response) => this.verify2FAuth(req, res));
+        this.router.get('/add2factor/:username', jwtMiddleware, (req: Request, res: Response) => this.create2FAuth(req, res));
 
         this.router.post('/logout', (req: Request, res: Response) => this.logout(req, res));
         this.router.post('/authenticate', (req: Request, res: Response) => this.authenticateUser(req, res));
         this.router.post('', jwtMiddleware, (req: Request, res: Response) => this.addUser(req, res));
-        this.router.post('/add2factor/:username', jwtMiddleware, (req: Request, res: Response) => this.create2FAuth(req, res));
     }
 
     private getCurrentUser(req: Request, res: Response): void {
@@ -72,21 +68,25 @@ export class ClientUserRoutes {
     }
 
     private create2FAuth(req: Request, res: Response) {
-        const {username} = req.body;
+        const {username} = req.params;
 
-        // TODO store secret in the database on the user object
-        this.secret = authenticator.generateSecret();
-        const otpAuth = authenticator.keyuri(encodeURIComponent(username), encodeURIComponent('Home-Bridge'), this.secret);
 
-        toDataURL(otpAuth, ((error, url) => {
-            res.json(url);
-        }));
+        this.userHandler.create2FactorAuthUrl(username)
+            .subscribe(result => {
+                res.json(result);
+            }, error => {
+                res.status(401).json(error);
+            });
     }
 
     private verify2FAuth(req: Request, res: Response) {
-        const {username, token} = req.params;
+        const {username, code} = req.params;
 
-        // TODO retrieve the secret from the database user object
-        res.json({verified: authenticator.check(token, this.secret)});
+        this.userHandler.verify2FactorAuthCode(username, code)
+            .subscribe(result => {
+                res.json(result);
+            }, error => {
+                res.status(401).json(error);
+            });
     }
 }

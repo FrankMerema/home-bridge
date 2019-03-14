@@ -1,7 +1,9 @@
 import { Collection, Database } from '@frankmerema/abstract-database';
 import { compare, hash } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
-import { from, Observable, of, throwError } from 'rxjs';
+import { authenticator } from 'otplib';
+import { toDataURL } from 'qrcode';
+import { bindNodeCallback, from, Observable, of, throwError } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { UserModel, UserSchema } from '../model/user.model';
 
@@ -67,6 +69,24 @@ export class UserHandler {
                     return throwError('Username / Password incorrect');
                 }
             }));
+    }
+
+    create2FactorAuthUrl(username: string): Observable<string> {
+        const toDataUrl = bindNodeCallback(toDataURL);
+
+        return this.userCollection
+            .findOneAndUpdate({username: username}, {twoFactorAuthSecret: authenticator.generateSecret()}, {new: true})
+            .pipe(switchMap(user => {
+                    const otpAuthPath = authenticator.keyuri(encodeURIComponent(user.username), encodeURIComponent('Home-Bridge'), user.twoFactorAuthSecret);
+
+                    return toDataUrl(otpAuthPath) as Observable<string>;
+                })
+            );
+    }
+
+    verify2FactorAuthCode(username: string, code: string): Observable<any> {
+        return this.getUser(username)
+            .pipe(map(user => ({verified: authenticator.check(code, user.twoFactorAuthSecret)})));
     }
 
     private createJWT(user: UserModel): string {

@@ -23,9 +23,9 @@ export class HostHandler {
                 hosts.forEach(host => {
                     hbAxios.get(`http://${host.ip}:${host.port}/api/status`)
                         .subscribe(() => {
-                            this.updateHostStatus(host.ip, 'online');
+                            this.updateHostStatus(host.ip, 'online').subscribe();
                         }, () => {
-                            this.updateHostStatus(host.ip, 'offline');
+                            this.updateHostStatus(host.ip, 'offline').subscribe();
                             console.error(`${host.hostName} didn't respond so set to 'offline'`);
                         });
                 });

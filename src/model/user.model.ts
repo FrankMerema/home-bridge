@@ -1,8 +1,9 @@
-import {Document, Schema} from 'mongoose';
+import { Document, Schema } from 'mongoose';
 
 export interface UserModel extends Document {
     username: string;
     password: string;
+    twoFactorAuthSecret: string;
 }
 
 export const UserSchema = new Schema({
@@ -11,6 +12,10 @@ export const UserSchema = new Schema({
             required: true
         },
         password: {
+            type: String,
+            required: true
+        },
+        twoFactorAuthSecret: {
             type: String,
             required: true
         }
@@ -26,6 +31,7 @@ UserSchema.set('toJSON', {
         delete converted.created;
         delete converted._id;
         delete converted.password;
+        delete converted.twoFactorAuthSecret;
     }
 });
 
