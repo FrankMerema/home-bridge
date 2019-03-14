@@ -19,8 +19,8 @@ export class ClientUserRoutes {
 
     private setupRoutes(): void {
         this.router.get('/current', jwtMiddleware, (req: Request, res: Response) => this.getCurrentUser(req, res));
-        this.router.get('/verify2factor/:username/:code', jwtMiddleware, (req: Request, res: Response) => this.verify2FAuth(req, res));
         this.router.get('/add2factor/:username', jwtMiddleware, (req: Request, res: Response) => this.create2FAuth(req, res));
+        this.router.get('/verify2factor/:username/:code', jwtMiddleware, (req: Request, res: Response) => this.verify2FAuth(req, res));
 
         this.router.post('/logout', (req: Request, res: Response) => this.logout(req, res));
         this.router.post('/authenticate', (req: Request, res: Response) => this.authenticateUser(req, res));
