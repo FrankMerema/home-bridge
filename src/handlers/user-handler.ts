@@ -4,7 +4,7 @@ import { sign } from 'jsonwebtoken';
 import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
 import { bindNodeCallback, from, Observable, of, throwError } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { UserModel, UserSchema } from '../model/user.model';
 
 const config = require('../../service.config.json');
@@ -24,51 +24,43 @@ export class UserHandler {
     }
 
     getUser(username: string): Observable<UserModel> {
-        return this.userCollection.findOne({username: username});
+        return this.userCollection.findOne({username: username})
+            .pipe(catchError(() => throwError(`Cannot find an user for ${username}`)));
     }
 
-    addUser(username: string, password: string): Observable<{ user: UserModel, token: string }> {
+    addUser(username: string, password: string): Observable<{ user: UserModel, hasTwoFactorEnabled: boolean }> {
         if (!username || !password) {
             return throwError('Username and password are required!');
         }
 
-        return this.userCollection.findOne({username: username})
-            .pipe(switchMap(user => {
-                if (!user) {
-                    return from(hash(password, 12))
-                        .pipe(switchMap(encryptedPassword => {
-                            return this.userCollection.save(<UserModel>{
-                                username: username,
-                                password: encryptedPassword
-                            }).pipe(
-                                map(newUser => ({user: newUser, token: this.createJWT(newUser)})));
-                        }));
-                } else {
-                    return throwError('User already exists');
-                }
-            }));
+        return this.getUser(username)
+            .pipe(switchMap(_ => from(hash(password, 12))
+                .pipe(switchMap(encryptedPassword =>
+                    this.userCollection.save(<UserModel>{username: username, password: encryptedPassword})
+                        .pipe(map(newUser =>
+                            ({user: newUser, hasTwoFactorEnabled: false})))
+                ))
+            ), catchError(_ => throwError('User already exists')));
     }
 
-    authenticateUser(username: string, password: string): Observable<{ user: UserModel, token: string }> {
+    authenticateUser(username: string, password: string): Observable<{ user: UserModel, hasTwoFactorEnabled: boolean }> {
         if (!username || !password) {
             return throwError('Username and password are required!');
         }
 
-        return this.userCollection.findOne({username: username})
-            .pipe(switchMap(user => {
-                if (user) {
-                    return from(compare(password, user.password))
-                        .pipe(switchMap(success => {
-                            if (success) {
-                                return of({user: user, token: this.createJWT(user)});
-                            } else {
-                                return throwError('Username / Password incorrect');
-                            }
-                        }));
-                } else {
-                    return throwError('Username / Password incorrect');
-                }
-            }));
+        return this.getUser(username)
+            .pipe(switchMap(user => from(compare(password, user.password))
+                .pipe(switchMap(success => {
+                    if (success) {
+                        return of({
+                            user: user,
+                            hasTwoFactorEnabled: !!user.twoFactorAuthSecret && user.twoFactorSecretConfirmed
+                        });
+                    } else {
+                        return throwError('Username / Password incorrect');
+                    }
+                }))
+            ));
     }
 
     create2FactorAuthUrl(username: string): Observable<string> {
@@ -84,9 +76,19 @@ export class UserHandler {
             );
     }
 
-    verify2FactorAuthCode(username: string, code: string): Observable<any> {
+    verify2FactorAuthCode(username: string, code: string): Observable<{ jwt: string }> {
         return this.getUser(username)
-            .pipe(map(user => ({verified: authenticator.check(code, user.twoFactorAuthSecret)})));
+            .pipe(switchMap(user => {
+                if (authenticator.check(code, user.twoFactorAuthSecret)) {
+                    if (!user.twoFactorSecretConfirmed) {
+                        this.userCollection.findOneAndUpdate({username: username}, {twoFactorSecretConfirmed: true})
+                            .subscribe();
+                    }
+                    return of({jwt: this.createJWT(user)});
+                } else {
+                    return throwError('The code is expired or not valid, please try again.');
+                }
+            }));
     }
 
     private createJWT(user: UserModel): string {

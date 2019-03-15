@@ -4,6 +4,7 @@ export interface UserModel extends Document {
     username: string;
     password: string;
     twoFactorAuthSecret: string;
+    twoFactorSecretConfirmed: boolean;
 }
 
 export const UserSchema = new Schema({
@@ -17,6 +18,11 @@ export const UserSchema = new Schema({
         },
         twoFactorAuthSecret: {
             type: String,
+            required: true
+        },
+        twoFactorSecretConfirmed: {
+            type: Boolean,
+            default: false,
             required: true
         }
     },

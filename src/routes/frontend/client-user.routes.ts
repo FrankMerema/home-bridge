@@ -19,8 +19,8 @@ export class ClientUserRoutes {
 
     private setupRoutes(): void {
         this.router.get('/current', jwtMiddleware, (req: Request, res: Response) => this.getCurrentUser(req, res));
-        this.router.get('/add2factor/:username', jwtMiddleware, (req: Request, res: Response) => this.create2FAuth(req, res));
-        this.router.get('/verify2factor/:username/:code', jwtMiddleware, (req: Request, res: Response) => this.verify2FAuth(req, res));
+        this.router.get('/add2factor/:username', (req: Request, res: Response) => this.create2FAuth(req, res));
+        this.router.get('/verify2factor/:username/:code', (req: Request, res: Response) => this.verify2FAuth(req, res));
 
         this.router.post('/logout', (req: Request, res: Response) => this.logout(req, res));
         this.router.post('/authenticate', (req: Request, res: Response) => this.authenticateUser(req, res));
@@ -43,8 +43,7 @@ export class ClientUserRoutes {
 
         this.userHandler.addUser(username, password)
             .subscribe(result => {
-                res.cookie('SESSIONID', result.token, {httpOnly: true});
-                res.json(result.user);
+                res.json(result);
             }, error => {
                 res.status(404).json(error);
             });
@@ -55,8 +54,7 @@ export class ClientUserRoutes {
 
         this.userHandler.authenticateUser(username, password)
             .subscribe(result => {
-                res.cookie('SESSIONID', result.token, {httpOnly: true});
-                res.json(result.user);
+                res.json(result);
             }, error => {
                 res.status(401).json(error);
             });
@@ -69,7 +67,6 @@ export class ClientUserRoutes {
 
     private create2FAuth(req: Request, res: Response) {
         const {username} = req.params;
-
 
         this.userHandler.create2FactorAuthUrl(username)
             .subscribe(result => {
@@ -84,7 +81,8 @@ export class ClientUserRoutes {
 
         this.userHandler.verify2FactorAuthCode(username, code)
             .subscribe(result => {
-                res.json(result);
+                res.cookie('SESSIONID', result.jwt, {httpOnly: true});
+                res.json({});
             }, error => {
                 res.status(401).json(error);
             });
