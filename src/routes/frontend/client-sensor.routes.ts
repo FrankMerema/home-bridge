@@ -1,5 +1,5 @@
+import { SensorHandler } from '@handlers';
 import { Request, Response, Router } from 'express';
-import { SensorHandler } from '../../handlers/sensor-handler';
 
 export class ClientSensorRoutes {
 

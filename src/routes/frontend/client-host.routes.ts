@@ -1,5 +1,5 @@
+import { HostHandler } from '@handlers';
 import { Request, Response, Router } from 'express';
-import { HostHandler } from '../../handlers/host-handler';
 
 export class ClientHostRoutes {
 

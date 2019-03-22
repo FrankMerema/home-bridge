@@ -1,11 +1,11 @@
 import { Collection, Database } from '@frankmerema/abstract-database';
+import { UserModel, UserSchema } from '@shared/models';
 import { compare, hash } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
 import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
 import { bindNodeCallback, from, Observable, of, throwError } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
-import { UserModel, UserSchema } from '../model/user.model';
 
 const config = require('../../service.config.json');
 

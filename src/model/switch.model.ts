@@ -1,6 +1,5 @@
-import {Document, Schema} from 'mongoose';
-import {StateHistory} from './state-history.model';
-import {State} from './state.enum';
+import { State, StateHistory } from '@shared/models';
+import { Document, Schema } from 'mongoose';
 
 export interface SwitchModel extends Document {
     created: Date;

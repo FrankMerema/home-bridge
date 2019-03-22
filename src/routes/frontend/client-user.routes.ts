@@ -1,6 +1,6 @@
+import { UserHandler } from '@handlers';
+import { jwtMiddleware } from '@middleware';
 import { Request, Response, Router } from 'express';
-import { UserHandler } from '../../handlers/user-handler';
-import { jwtMiddleware } from '../../middleware/jwt-verifier.middleware';
 
 export class ClientUserRoutes {
 

@@ -1,5 +1,5 @@
+import { SwitchHandler } from '@handlers';
 import { Request, Response, Router } from 'express';
-import { SwitchHandler } from '../../handlers/switch-handler';
 
 export class ServerSwitchRoutes {
 
