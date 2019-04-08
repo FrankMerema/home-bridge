@@ -8,23 +8,6 @@
         "sourceMap": true,
         "outDir": "dist",
         "baseUrl": "./src",
-        "paths": {
-            "@routes/frontend": [
-                "routes/frontend"
-            ],
-            "@routes/server": [
-                "routes/server"
-            ],
-            "@middleware": [
-                "middleware"
-            ],
-            "@shared/models": [
-                "model"
-            ],
-            "@handlers": [
-                "handlers"
-            ]
-        },
         "lib": [
             "dom",
             "es2017"

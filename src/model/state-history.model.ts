@@ -1,4 +1,4 @@
-import { State } from '@shared/models';
+import { State } from './state.enum';
 
 export interface StateHistory {
     state: State;

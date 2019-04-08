@@ -1,7 +1,7 @@
 import { Collection, Database } from '@frankmerema/abstract-database';
-import { HostDto, HostModel, HostSchema, HostStatus } from '@shared/models';
 import { Observable, throwError } from 'rxjs';
 import { hbAxios } from '../helpers/axios-observable';
+import { HostDto, HostModel, HostSchema, HostStatus } from '../model';
 
 const config = require('../../service.config.json');
 

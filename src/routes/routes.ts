@@ -1,8 +1,8 @@
-import { HostHandler, SensorHandler, SwitchHandler } from '@handlers';
-import { jwtMiddleware } from '@middleware';
-import { ClientHostRoutes, ClientSensorRoutes, ClientSwitchRoutes, ClientUserRoutes } from '@routes/frontend';
-import { ServerHostRoutes, ServerSensorRoutes, ServerSwitchRoutes } from '@routes/server';
 import { Request, Response, Router } from 'express';
+import { HostHandler, SensorHandler, SwitchHandler } from '../handlers';
+import { jwtMiddleware } from '../middleware';
+import { ClientHostRoutes, ClientSensorRoutes, ClientSwitchRoutes, ClientUserRoutes } from './frontend';
+import { ServerHostRoutes, ServerSensorRoutes, ServerSwitchRoutes } from './server';
 
 export class Routes {
     private readonly router: Router;

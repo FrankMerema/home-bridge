@@ -1,8 +1,8 @@
 import { Collection, Database } from '@frankmerema/abstract-database';
-import { HostModel, HostSchema, State, SwitchModel, SwitchSchema } from '@shared/models';
 import { EMPTY, Observable, throwError } from 'rxjs';
 import { catchError, defaultIfEmpty, mergeMap, switchMap } from 'rxjs/operators';
 import { hbAxios } from '../helpers/axios-observable';
+import { HostModel, HostSchema, State, SwitchModel, SwitchSchema } from '../model';
 
 const config = require('../../service.config.json');
 
