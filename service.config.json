@@ -11,13 +11,5 @@
         },
         "username": "FrankM",
         "password": "bLq0NB3xOjZHALFX"
-    },
-    "plugins": [
-        {
-            "name": "somfy-tahoma",
-            "type": "tahoma",
-            "username": "",
-            "password": ""
-        }
-    ]
+    }
 }
