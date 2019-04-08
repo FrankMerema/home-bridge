@@ -1,4 +1,4 @@
-import { Collection, Database } from '@frankmerema/abstract-database';
+import { Collection, MongoAtlasDatabase } from '@frankmerema/abstract-database';
 import { compare, hash } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
 import { authenticator } from 'otplib';
@@ -14,11 +14,11 @@ export class UserHandler {
     private userCollection: Collection<UserModel>;
 
     constructor() {
-        const connection = new Database('localhost', 27017,
-            config.database.name, config.database.config).getConnection();
+        // const connection = new Database('localhost', 27017,
+        //     config.database.name, config.database.config).getConnection();
 
-        // const connection = new MongoAtlasDatabase(config.database.username, config.database.password,
-        //     config.database.host, config.database.name, config.database.config).getConnection();
+        const connection = new MongoAtlasDatabase(config.database.username, config.database.password,
+            config.database.host, config.database.name, config.database.config).getConnection();
 
         this.userCollection = new Collection<UserModel>(connection, 'user', UserSchema, 'users');
     }

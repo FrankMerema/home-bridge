@@ -1,4 +1,4 @@
-import { Collection, Database } from '@frankmerema/abstract-database';
+import { Collection, MongoAtlasDatabase } from '@frankmerema/abstract-database';
 import { EMPTY, Observable, throwError } from 'rxjs';
 import { catchError, defaultIfEmpty, mergeMap, switchMap } from 'rxjs/operators';
 import { hbAxios } from '../helpers/axios-observable';
@@ -12,11 +12,11 @@ export class SwitchHandler {
     private hostCollection: Collection<HostModel>;
 
     constructor() {
-        const connection = new Database('localhost', 27017,
-            config.database.name, config.database.config).getConnection();
+        // const connection = new Database('localhost', 27017,
+        //     config.database.name, config.database.config).getConnection();
 
-        // const connection = new MongoAtlasDatabase(config.database.username, config.database.password,
-        //     config.database.host, config.database.name, config.database.config).getConnection();
+        const connection = new MongoAtlasDatabase(config.database.username, config.database.password,
+            config.database.host, config.database.name, config.database.config).getConnection();
 
         this.switchCollection = new Collection<SwitchModel>(connection, 'switch', SwitchSchema, 'switches');
         this.hostCollection = new Collection<HostModel>(connection, 'host', HostSchema, 'hosts');
