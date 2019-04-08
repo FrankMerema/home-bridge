@@ -74,3 +74,5 @@ typings/
 #own config files
 *.config.json
 /scripts/init_mongo_vars.sh
+/scripts/add-default-user.js
+/scripts/add-default-user.sh
