@@ -5,8 +5,9 @@
   "main": "dist/start.js",
   "scripts": {
     "build": "tsc",
-    "start:single": "node --inspect=5858 -r ts-node/register src/start.ts",
-    "start": "nodemon"
+    "server:start": "node dist/start.js",
+    "dev:start": "nodemon",
+    "dev:start:single": "node --inspect=5858 -r ts-node/register src/start.ts"
   },
   "repository": {
     "type": "git",
