@@ -2,10 +2,9 @@ import { Collection, MongoAtlasDatabase } from '@frankmerema/abstract-database';
 import { Observable, throwError } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { hbAxios } from '../helpers/axios-observable';
+import { setupMongoConnection } from '../helpers/mongo-connection/mongo-connection';
 import { HostModel, HostSchema, SensorModel, SensorSchema, State, SwitchModel } from '../model';
 import { SwitchHandler } from './switch-handler';
-
-const config = require('../../service.config.json');
 
 export class SensorHandler {
 
@@ -14,14 +13,8 @@ export class SensorHandler {
     private switchHandler: SwitchHandler;
 
     constructor(switchHandler: SwitchHandler) {
-        // const connection = new Database('localhost', 27017,
-        //     config.database.name, config.database.config).getConnection();
-
-        const connection = new MongoAtlasDatabase(config.database.username, config.database.password,
-            config.database.host, config.database.name, config.database.config).getConnection();
-
-        this.sensorCollection = new Collection<SensorModel>(connection, 'sensor', SensorSchema, 'sensors');
-        this.hostCollection = new Collection<HostModel>(connection, 'host', HostSchema, 'hosts');
+        this.sensorCollection = new Collection<SensorModel>(setupMongoConnection(), 'sensor', SensorSchema, 'sensors');
+        this.hostCollection = new Collection<HostModel>(setupMongoConnection(), 'host', HostSchema, 'hosts');
 
         this.switchHandler = switchHandler;
 

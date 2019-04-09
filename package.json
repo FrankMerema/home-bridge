@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc",
     "server:start": "node dist/start.js",
+    "prod:server:start": "node dist/start.js --prod",
     "dev:start": "nodemon",
     "dev:start:single": "node --inspect=5858 -r ts-node/register src/start.ts"
   },

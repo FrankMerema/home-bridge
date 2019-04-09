@@ -1,10 +1,11 @@
-import { Collection, MongoAtlasDatabase } from '@frankmerema/abstract-database';
+import { Collection } from '@frankmerema/abstract-database';
 import { compare, hash } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
 import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
 import { bindNodeCallback, from, Observable, of, throwError } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
+import { setupMongoConnection } from '../helpers/mongo-connection/mongo-connection';
 import { UserModel, UserSchema } from '../model';
 
 const config = require('../../service.config.json');
@@ -14,13 +15,7 @@ export class UserHandler {
     private userCollection: Collection<UserModel>;
 
     constructor() {
-        // const connection = new Database('localhost', 27017,
-        //     config.database.name, config.database.config).getConnection();
-
-        const connection = new MongoAtlasDatabase(config.database.username, config.database.password,
-            config.database.host, config.database.name, config.database.config).getConnection();
-
-        this.userCollection = new Collection<UserModel>(connection, 'user', UserSchema, 'users');
+        this.userCollection = new Collection<UserModel>(setupMongoConnection(), 'user', UserSchema, 'users');
     }
 
     getUser(username: string): Observable<UserModel> {
