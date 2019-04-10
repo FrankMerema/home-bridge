@@ -6,11 +6,9 @@ const config = require('../../../service.config.json');
 
 export const setupMongoConnection = (): Observable<Mongoose> => {
     if (process.argv.indexOf('--prod') === -1) {
-        console.log('no prod');
         return new Database('localhost', 27017,
             config.database.name, config.database.config).getConnection();
     } else {
-        console.log('prod');
         return new MongoAtlasDatabase(config.database.username, config.database.password,
             config.database.host, config.database.name, config.database.config).getConnection();
     }
