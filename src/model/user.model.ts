@@ -17,8 +17,7 @@ export const UserSchema = new Schema({
             required: true
         },
         twoFactorAuthSecret: {
-            type: String,
-            required: true
+            type: String
         },
         twoFactorSecretConfirmed: {
             type: Boolean,

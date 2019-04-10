@@ -8,7 +8,7 @@ export interface SwitchModel extends Document {
     name: string;
     pin: number;
     state: State;
-    stateHistory: Array<StateHistory>;
+    stateHistory: StateHistory[];
 }
 
 export const SwitchSchema = new Schema({

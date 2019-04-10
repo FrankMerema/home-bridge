@@ -63,12 +63,12 @@ export class SwitchHandler {
             }));
     }
 
-    getSwitches(hostId: string): Observable<Array<SwitchModel>> {
+    getSwitches(hostId: string): Observable<SwitchModel[]> {
         return this.switchCollection.find({}, null, {
             path: 'host',
             select: 'created _id hostName status',
             match: {_id: hostId}
-        });
+        }).pipe(defaultIfEmpty([]));
     }
 
     getSwitchState(switchId: string): Observable<{} | SwitchModel> {

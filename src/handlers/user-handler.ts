@@ -4,7 +4,7 @@ import { sign } from 'jsonwebtoken';
 import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
 import { bindNodeCallback, from, Observable, of, throwError } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { setupMongoConnection } from '../helpers/mongo-connection/mongo-connection';
 import { UserModel, UserSchema } from '../model';
 
@@ -19,8 +19,7 @@ export class UserHandler {
     }
 
     getUser(username: string): Observable<UserModel> {
-        return this.userCollection.findOne({username: username})
-            .pipe(catchError(() => throwError(`Cannot find an user for ${username}`)));
+        return this.userCollection.findOne({username: username});
     }
 
     addUser(username: string, password: string): Observable<{ user: UserModel, hasTwoFactorEnabled: boolean }> {
@@ -29,13 +28,18 @@ export class UserHandler {
         }
 
         return this.getUser(username)
-            .pipe(switchMap(_ => from(hash(password, 12))
-                .pipe(switchMap(encryptedPassword =>
-                    this.userCollection.save(<UserModel>{username: username, password: encryptedPassword})
-                        .pipe(map(newUser =>
-                            ({user: newUser, hasTwoFactorEnabled: false})))
-                ))
-            ), catchError(_ => throwError('User already exists')));
+            .pipe(tap(user => {
+                    if (user) {
+                        throwError('User already exists');
+                    }
+                }),
+                switchMap(_ => from(hash(password, 12))
+                    .pipe(switchMap(encryptedPassword =>
+                        this.userCollection.save(<UserModel>{username: username, password: encryptedPassword})
+                            .pipe(map(newUser =>
+                                ({user: newUser, hasTwoFactorEnabled: false})))
+                    ))
+                ));
     }
 
     authenticateUser(username: string, password: string): Observable<{ user: UserModel, hasTwoFactorEnabled: boolean }> {
@@ -55,7 +59,7 @@ export class UserHandler {
                         return throwError('Username / Password incorrect');
                     }
                 }))
-            ));
+            ), catchError(() => throwError('Username / Password incorrect')));
     }
 
     create2FactorAuthUrl(username: string): Observable<string> {
@@ -83,7 +87,7 @@ export class UserHandler {
                 } else {
                     return throwError('The code is expired or not valid, please try again.');
                 }
-            }));
+            }), catchError(() => throwError(`Cannot verify the token for ${username}`)));
     }
 
     private createJWT(user: UserModel): string {
