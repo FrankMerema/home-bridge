@@ -1,6 +1,6 @@
-import { Collection, MongoAtlasDatabase } from '@frankmerema/abstract-database';
+import { Collection } from '@frankmerema/abstract-database';
 import { Observable, throwError } from 'rxjs';
-import { defaultIfEmpty, switchMap } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 import { hbAxios } from '../helpers/axios-observable';
 import { setupMongoConnection } from '../helpers/mongo-connection/mongo-connection';
 import { HostModel, HostSchema, SensorModel, SensorSchema, State, SwitchModel } from '../model';
@@ -49,7 +49,7 @@ export class SensorHandler {
             path: 'host',
             select: 'created _id hostName status',
             match: {_id: hostId}
-        }).pipe(defaultIfEmpty([]));
+        }).pipe(map(sensors => sensors.length ? sensors : []));
     }
 
     addSensor(pin: number, hostId: string, name: string, targetId?: string): Observable<SensorModel> {

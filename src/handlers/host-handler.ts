@@ -1,6 +1,6 @@
 import { Collection } from '@frankmerema/abstract-database';
 import { Observable, throwError } from 'rxjs';
-import { defaultIfEmpty } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { hbAxios } from '../helpers/axios-observable';
 import { setupMongoConnection } from '../helpers/mongo-connection/mongo-connection';
 import { HostDto, HostModel, HostSchema, HostStatus } from '../model';
@@ -36,7 +36,7 @@ export class HostHandler {
 
     getAllHosts(): Observable<HostModel[]> {
         return this.hostCollection.aggregate({}, HostDto)
-            .pipe(defaultIfEmpty([]));
+            .pipe(map(hosts => hosts.length ? hosts : []));
     }
 
     addHost(hostName: string, name: string, ip: string, port: number): Observable<HostModel> {

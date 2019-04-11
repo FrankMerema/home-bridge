@@ -1,6 +1,6 @@
-import { Collection, MongoAtlasDatabase } from '@frankmerema/abstract-database';
+import { Collection } from '@frankmerema/abstract-database';
 import { EMPTY, Observable, throwError } from 'rxjs';
-import { catchError, defaultIfEmpty, mergeMap, switchMap } from 'rxjs/operators';
+import { catchError, defaultIfEmpty, map, mergeMap, switchMap } from 'rxjs/operators';
 import { hbAxios } from '../helpers/axios-observable';
 import { setupMongoConnection } from '../helpers/mongo-connection/mongo-connection';
 import { HostModel, HostSchema, State, SwitchModel, SwitchSchema } from '../model';
@@ -68,7 +68,7 @@ export class SwitchHandler {
             path: 'host',
             select: 'created _id hostName status',
             match: {_id: hostId}
-        }).pipe(defaultIfEmpty([]));
+        }).pipe(map(switches => switches.length ? switches : []));
     }
 
     getSwitchState(switchId: string): Observable<{} | SwitchModel> {
