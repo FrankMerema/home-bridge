@@ -1,11 +1,13 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ClientModule } from './client/client.module';
+import { AuthenticationModule } from './authentication/authentication.module';
+import { UserModule } from './user/user.module';
 
 @Module({
     imports: [
-        ClientModule,
-        MongooseModule.forRoot('mongodb://localhost/nest')
+        MongooseModule.forRoot('mongodb://localhost/home-automation'),
+        AuthenticationModule,
+        UserModule
     ]
 })
 export class AppModule {

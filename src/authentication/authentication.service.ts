@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { compare } from 'bcrypt';
 import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
 import { from, Observable, of, throwError } from 'rxjs';
 import { bindNodeCallback } from 'rxjs/internal/observable/bindNodeCallback';
 import { catchError, switchMap } from 'rxjs/operators';
-import { UserDto } from '../../models/user/user.dto';
-import { JwtService } from '../jwt/jwt.service';
+import { UserDto } from '../shared/models/user/user.dto';
 import { UserService } from '../user/user.service';
 
 @Injectable()
@@ -44,6 +44,21 @@ export class AuthenticationService {
                 const otpAuthPath = authenticator.keyuri(encodeURIComponent(user.username), encodeURIComponent('Home-Bridge'), user.twoFactorAuthSecret);
 
                 return toDataUrl(otpAuthPath) as Observable<string>;
+            }));
+    }
+
+    verify2FactorAuthCode(username: string, code: string): Observable<string> {
+        return this.userService.getUser(username)
+            .pipe(switchMap(user => {
+                if (authenticator.check(code, user.twoFactorAuthSecret)) {
+                    if (!user.twoFactorSecretConfirmed) {
+                        this.userService.updateUser(username, {twoFactorSecretConfirmed: true})
+                            .subscribe();
+                    }
+                    return of(this.jwtService.sign(user, {expiresIn: 3600}));
+                } else {
+                    return throwError('The code is expired or not valid, please try again.');
+                }
             }));
     }
 }

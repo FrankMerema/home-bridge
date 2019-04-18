@@ -1,7 +1,8 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Param } from '@nestjs/common/decorators/http/route-params.decorator';
 import { Observable } from 'rxjs';
-import { UserDto } from '../../models/user/user.dto';
-import { UserService } from '../../service/user/user.service';
+import { UserDto } from '../shared/models/user/user.dto';
+import { UserService } from './user.service';
 
 interface newUserDto {
     username: string;
@@ -18,6 +19,11 @@ export class UserController {
     getCurrentUser(): string {
         // return this.userService.getUser(payload.username);
         return 'hi';
+    }
+
+    @Get('/:username')
+    getUser(@Param('username') username: string): Observable<UserDto> {
+        return this.userService.getUser(username);
     }
 
     @Post()

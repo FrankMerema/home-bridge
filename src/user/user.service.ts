@@ -4,8 +4,8 @@ import { hash } from 'bcrypt';
 import { Model } from 'mongoose';
 import { from, Observable, throwError } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
-import { UserDto } from '../../models/user/user.dto';
-import { UserModel } from '../../models/user/user.model';
+import { UserDto } from '../shared/models/user/user.dto';
+import { UserModel } from '../shared/models/user/user.model';
 
 @Injectable()
 export class UserService {
@@ -36,7 +36,7 @@ export class UserService {
                 ));
     }
 
-    updateUser(username: string, updateProps: any, options: any): Observable<UserModel> {
+    updateUser(username: string, updateProps: any, options?: any): Observable<UserModel> {
         return from(this.userModel.findOneAndUpdate({username: username}, updateProps, options));
     }
 }
