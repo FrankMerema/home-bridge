@@ -1,7 +1,9 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { Param } from '@nestjs/common/decorators/http/route-params.decorator';
+import { AuthGuard } from '@nestjs/passport';
+import { Request } from 'express';
 import { Observable } from 'rxjs';
-import { UserDto } from '../shared/models/user/user.dto';
+import { UserModel } from '../shared/models/user/user.model';
 import { UserService } from './user.service';
 
 interface newUserDto {
@@ -16,18 +18,20 @@ export class UserController {
     }
 
     @Get()
-    getCurrentUser(): string {
-        // return this.userService.getUser(payload.username);
-        return 'hi';
+    @UseGuards(AuthGuard('jwt'))
+    getCurrentUser(@Req() request: Request): Observable<UserModel> {
+        return request.user;
     }
 
     @Get('/:username')
-    getUser(@Param('username') username: string): Observable<UserDto> {
+    @UseGuards(AuthGuard('jwt'))
+    getUser(@Param('username') username: string): Observable<UserModel> {
         return this.userService.getUser(username);
     }
 
     @Post()
-    addUser(@Body() userDto: newUserDto): Observable<UserDto> {
+    @UseGuards(AuthGuard('jwt'))
+    addUser(@Body() userDto: newUserDto): Observable<UserModel> {
         return this.userService.addUser(userDto.username, userDto.password);
     }
 }

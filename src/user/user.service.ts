@@ -1,10 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { hash } from 'bcrypt';
 import { Model } from 'mongoose';
-import { from, Observable, throwError } from 'rxjs';
-import { map, switchMap, tap } from 'rxjs/operators';
-import { UserDto } from '../shared/models/user/user.dto';
+import { from, Observable } from 'rxjs';
+import { switchMap, tap } from 'rxjs/operators';
 import { UserModel } from '../shared/models/user/user.model';
 
 @Injectable()
@@ -17,23 +16,24 @@ export class UserService {
         return from(this.userModel.findOne({username: username}));
     }
 
-    addUser(username: string, password: string): Observable<UserDto> {
+    addUser(username: string, password: string): Observable<UserModel> {
         if (!username || !password) {
-            return throwError('Username and password are required!');
+            throw new BadRequestException('Username and password are required!');
         }
 
         return this.getUser(username)
             .pipe(tap(user => {
                     if (user) {
-                        throwError('User already exists');
+                        throw new BadRequestException('User already exists');
                     }
                 }),
-                switchMap(_ => from(hash(password, 12))
-                    .pipe(switchMap(encryptedPassword =>
-                        from(new this.userModel({username: username, password: encryptedPassword}).save())
-                            .pipe(map(newUser =>
-                                ({username: newUser.username, twoFactorSecretConfirmed: false})))))
-                ));
+                switchMap(() => from(hash(password, 12))
+                    .pipe(switchMap(encryptedPassword => from(new this.userModel({
+                        username: username,
+                        password: encryptedPassword
+                    }).save())))
+                )
+            );
     }
 
     updateUser(username: string, updateProps: any, options?: any): Observable<UserModel> {

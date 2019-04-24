@@ -1,12 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { compare } from 'bcrypt';
 import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
-import { from, Observable, of, throwError } from 'rxjs';
+import { from, Observable } from 'rxjs';
 import { bindNodeCallback } from 'rxjs/internal/observable/bindNodeCallback';
-import { catchError, switchMap } from 'rxjs/operators';
-import { UserDto } from '../shared/models/user/user.dto';
+import { catchError, map, switchMap } from 'rxjs/operators';
+import { UserModel } from '../shared/models/user/user.model';
 import { UserService } from '../user/user.service';
 
 @Injectable()
@@ -16,24 +16,23 @@ export class AuthenticationService {
                 private jwtService: JwtService) {
     }
 
-    authenticate(username: string, password: string): Observable<UserDto> {
+    authenticate(username: string, password: string): Observable<UserModel> {
         if (!username || !password) {
-            return throwError('Username and password are required!');
+            throw new BadRequestException('Username and password are required!');
         }
 
         return this.userService.getUser(username)
             .pipe(switchMap(user => from(compare(password, user.password))
-                .pipe(switchMap(success => {
+                .pipe(map(success => {
                     if (success) {
-                        return of({
-                            username: user.username,
-                            twoFactorSecretConfirmed: !!user.twoFactorAuthSecret && user.twoFactorSecretConfirmed
-                        });
+                        return user;
                     } else {
-                        return throwError('Username / Password incorrect');
+                        throw new UnauthorizedException('Username / Password incorrect');
                     }
                 }))
-            ), catchError(() => throwError('Username / Password incorrect')));
+            ), catchError(() => {
+                throw new UnauthorizedException('Username / Password incorrect');
+            }));
     }
 
     create2FactorAuthUrl(username: string): Observable<string> {
@@ -49,15 +48,15 @@ export class AuthenticationService {
 
     verify2FactorAuthCode(username: string, code: string): Observable<string> {
         return this.userService.getUser(username)
-            .pipe(switchMap(user => {
+            .pipe(map(user => {
                 if (authenticator.check(code, user.twoFactorAuthSecret)) {
                     if (!user.twoFactorSecretConfirmed) {
                         this.userService.updateUser(username, {twoFactorSecretConfirmed: true})
                             .subscribe();
                     }
-                    return of(this.jwtService.sign(user, {expiresIn: 3600}));
+                    return this.jwtService.sign({username: user.username}, {expiresIn: 3600});
                 } else {
-                    return throwError('The code is expired or not valid, please try again.');
+                    throw new UnauthorizedException('The code is expired or not valid, please try again.');
                 }
             }));
     }

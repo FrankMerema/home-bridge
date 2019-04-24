@@ -1,9 +1,14 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
+import { Request } from 'express';
 import { Observable } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-import { UserDto } from '../shared/models/user/user.dto';
+import { map } from 'rxjs/operators';
+import { UserModel } from '../shared/models/user/user.model';
 import { AuthenticationService } from './authentication.service';
-import { LoginRequest } from './interfaces/login-request.interface';
+
+interface LoginRequest {
+    username: string;
+    password: string;
+}
 
 @Controller('authenticate')
 export class AuthenticationController {
@@ -12,11 +17,8 @@ export class AuthenticationController {
     }
 
     @Post()
-    authenticateUser(@Body() loginRequest: LoginRequest): Observable<UserDto> {
-        return this.authenticationService.authenticate(loginRequest.username, loginRequest.password)
-            .pipe(catchError(err => {
-                throw new HttpException(err, HttpStatus.UNAUTHORIZED);
-            }));
+    authenticateUser(@Body() loginRequest: LoginRequest): Observable<UserModel> {
+        return this.authenticationService.authenticate(loginRequest.username, loginRequest.password);
     }
 
     @Get('add2factor/:username')
@@ -25,8 +27,12 @@ export class AuthenticationController {
     }
 
     @Get('/verify2factor/:username/:code')
-    verify2FactorAuthCode(@Param('username') username: string, @Param('code') code: string): Observable<string> {
-        console.log(username, code);
-        return this.authenticationService.verify2FactorAuthCode(username, code);
+    verify2FactorAuthCode(@Param('username') username: string, @Param('code') code: string, @Req() req: Request): Observable<{}> {
+        return this.authenticationService.verify2FactorAuthCode(username, code)
+            .pipe(map(jwt => {
+                req.res.cookie('SESSIONID', jwt, {httpOnly: true});
+
+                return {};
+            }));
     }
 }
