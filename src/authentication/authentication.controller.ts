@@ -35,4 +35,10 @@ export class AuthenticationController {
                 return {};
             }));
     }
+
+    @Post('logout')
+    logout(@Req() req: Request): {} {
+        req.res.clearCookie('SESSIONID');
+        return {};
+    }
 }
