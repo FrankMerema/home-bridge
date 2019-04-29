@@ -11,12 +11,12 @@ export class HostService {
     constructor(@InjectModel('Host') private hostModel: Model<HostModel>) {
     }
 
-    getHost(ip: string): Observable<HostModel> {
-        return from(this.hostModel.findOne({ip: ip}));
+    getHost(name: string): Observable<HostModel> {
+        return from(this.hostModel.findOne({name: name}));
     }
 
-    getHostStatus(ip: string): Observable<{ status: HostStatus }> {
-        return from(this.hostModel.findOne({ip: ip}, {status: true}));
+    getHostStatus(name: string): Observable<{ status: HostStatus }> {
+        return from(this.hostModel.findOne({name: name}, {status: true}));
     }
 
     getAllHosts(): Observable<HostModel[]> {
@@ -32,12 +32,12 @@ export class HostService {
         const newHost = <HostModel>{hostName: hostName, name: name, ip: ip, port: port, status: 'online'};
         console.info(`New host added: ${newHost.name}`);
 
-        return from(this.hostModel.findOneAndUpdate({ip: ip}, newHost, {upsert: true, new: true}));
+        return from(this.hostModel.findOneAndUpdate({name: name}, newHost, {upsert: true, new: true}));
     }
 
-    removeHost(id: string): Observable<{}> {
+    deleteHost(id: string): Observable<HostModel> {
         console.info(`Removing host with ip: ${id}`);
-        return from(this.hostModel.findOneAndRemove({_id: id})).pipe(map(() => ({})));
+        return from(this.hostModel.findOneAndRemove({_id: id}));
     }
 
     updateHostStatus(ip: string, status: HostStatus): Observable<HostModel> {

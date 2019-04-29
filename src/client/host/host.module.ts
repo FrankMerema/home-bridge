@@ -9,7 +9,8 @@ import { HostService } from './host.service';
         MongooseModule.forFeature([{name: 'Host', schema: HostSchema}])
     ],
     controllers: [HostController],
-    providers: [HostService]
+    providers: [HostService],
+    exports: [HostService]
 })
 export class HostModule {
 }
