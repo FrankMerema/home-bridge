@@ -1,11 +1,10 @@
 import { BadRequestException, HttpService, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { HardwareCreatedResponse, SensorModel, State, StateResponse } from '@shared/models';
+import { HostService, SwitchService } from '@shared/service';
 import { Model } from 'mongoose';
 import { from, Observable } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
-import { HostService } from '../host/host.service';
-import { SwitchService } from '../switch/switch.service';
 
 @Injectable()
 export class SensorService {
