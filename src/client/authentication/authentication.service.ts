@@ -38,11 +38,18 @@ export class AuthenticationService {
     create2FactorAuthUrl(username: string): Observable<string> {
         const toDataUrl = bindNodeCallback(toDataURL);
 
-        return this.userService.updateUser(username, {twoFactorAuthSecret: authenticator.generateSecret()}, {new: true})
+        return this.userService.getUser(username)
             .pipe(switchMap(user => {
-                const otpAuthPath = authenticator.keyuri(encodeURIComponent(user.username), encodeURIComponent('Home-Bridge'), user.twoFactorAuthSecret);
+                if (user && user.twoFactorSecretConfirmed) {
+                    throw new UnauthorizedException('Two factor authentication is already confirmed');
+                } else {
+                    return this.userService.updateUser(username, {twoFactorAuthSecret: authenticator.generateSecret()}, {new: true})
+                        .pipe(switchMap(user => {
+                            const otpAuthPath = authenticator.keyuri(encodeURIComponent(user.username), encodeURIComponent('Home-Bridge'), user.twoFactorAuthSecret);
 
-                return toDataUrl(otpAuthPath) as Observable<string>;
+                            return toDataUrl(otpAuthPath) as Observable<string>;
+                        }));
+                }
             }));
     }
 
