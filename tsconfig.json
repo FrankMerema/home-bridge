@@ -19,6 +19,9 @@
       "@client/rest": [
         "client"
       ],
+      "@server/rest": [
+        "server"
+      ],
       "@config": [
         "config"
       ]
