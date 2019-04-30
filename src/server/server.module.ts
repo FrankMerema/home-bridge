@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { HostController } from '@server/rest';
+import { HostController, SensorController } from '@server/rest';
 import { ServiceModule } from '@shared/service';
 
 @Module({
@@ -7,7 +7,8 @@ import { ServiceModule } from '@shared/service';
         ServiceModule
     ],
     controllers: [
-        HostController
+        HostController,
+        SensorController
     ]
 })
 export class ServerModule {

@@ -21,11 +21,11 @@ export class SensorService {
             });
     }
 
-    getSensors(hostId: string): Observable<SensorModel[]> {
+    getSensors(name: string): Observable<SensorModel[]> {
         return from(this.sensorModel.find({}, null, {
             path: 'host',
-            select: 'created _id hostName status',
-            match: {_id: hostId}
+            select: 'created name hostName status',
+            match: {name: name}
         })).pipe(map(sensors => sensors.length ? sensors : []));
     }
 
@@ -69,8 +69,8 @@ export class SensorService {
                     ))));
     }
 
-    changeState(hostId: string, pin: string, state: State): Observable<void> {
-        return from(this.sensorModel.findOne({pin: pin}, null, {path: 'host', match: {_id: hostId}}))
+    updateState(name: string, pin: string, state: State): Observable<void> {
+        return from(this.sensorModel.findOne({pin: pin}, null, {path: 'host', match: {name: name}}))
             .pipe(switchMap(foundSensor =>
                 this.switchService.changeState(foundSensor.targetId, state)
             ));
