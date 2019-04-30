@@ -4,16 +4,15 @@ import { HardwareCreatedResponse, SensorModel, State, StateResponse } from '@sha
 import { HostService, SwitchService } from '@shared/service';
 import { Model } from 'mongoose';
 import { from, Observable } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { catchError, map, switchMap } from 'rxjs/operators';
 
 @Injectable()
 export class SensorService {
 
     constructor(@InjectModel('Sensor') private sensorModel: Model<SensorModel>,
-                private hostService: HostService,
                 private httpService: HttpService,
+                private hostService: HostService,
                 private switchService: SwitchService) {
-
         from(this.sensorModel.find())
             .subscribe(sensors => {
                 sensors.forEach(sensor => {
@@ -51,8 +50,12 @@ export class SensorService {
                                 new: true
                             });
                         }
-                    ))
-            ));
+                    ), catchError(() => {
+                        throw new BadRequestException(`No host found/online for hostname: ${hostname}`);
+                    }))
+            ), catchError(() => {
+                throw new BadRequestException(`No host found for hostname: ${hostname}`);
+            }));
     }
 
     deleteSensor(sensorId: string): Observable<void> {

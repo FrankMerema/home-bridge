@@ -1,3 +1,4 @@
+export * from './generic/hardware-create-dto.model';
 export * from './generic/hardware-created-response.model';
 export * from './generic/state.enum';
 export * from './generic/state-history.model';

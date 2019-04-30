@@ -28,7 +28,7 @@ export class SwitchService {
                 defaultIfEmpty(EMPTY));
     }
 
-    addSwitch(pin: number, hostname: string, name: string): Observable<{} | SwitchModel> {
+    addSwitch(pin: number, hostname: string, name: string): Observable<SwitchModel> {
         if (!pin || !hostname || !name) {
             throw new BadRequestException('Should set pin, hostname and name!');
         }
@@ -47,8 +47,12 @@ export class SwitchService {
                             upsert: true,
                             new: true
                         });
+                    }), catchError(() => {
+                        throw new BadRequestException(`No host found/online for hostname: ${hostname}`);
                     }))
-            ));
+            ), catchError(() => {
+                throw new BadRequestException(`No host found for hostname: ${hostname}`);
+            }));
     }
 
     deleteSwitch(name: string): Observable<void> {
@@ -69,7 +73,7 @@ export class SwitchService {
         })).pipe(map(switches => switches.length ? switches : []));
     }
 
-    changeState(name: string, state: State): Observable<void> {
+    changeState(name: string, state?: State): Observable<void> {
         return from(this.switchModel.findOne({name: name}).populate('host'))
             .pipe(switchMap(foundSwitch => {
                 const newState = {
@@ -90,11 +94,15 @@ export class SwitchService {
                         return from(foundSwitch.save())
                             .pipe(map(() => {
                             }));
+                    }), catchError(() => {
+                        throw new BadRequestException(`No host found/online for hostname: ${foundSwitch.host.hostname}`);
                     }));
+            }), catchError(() => {
+                throw new BadRequestException(`No switch found for name: ${name}`);
             }));
     }
 
-    private getSwitchState(name: string): Observable<{} | SwitchModel> {
+    getSwitchState(name: string): Observable<SwitchModel> {
         return from(this.switchModel.findOne({name: name}).populate('host'))
             .pipe(switchMap(foundSwitch =>
                 this.httpService.get<StateResponse>(`http://${foundSwitch.host.ip}:${foundSwitch.host.port}/api/switch/state/${foundSwitch.pin}`)
@@ -102,6 +110,10 @@ export class SwitchService {
                         foundSwitch.state = response.data.state;
 
                         return from(foundSwitch.save());
-                    }))));
+                    }), catchError(() => {
+                        throw new BadRequestException(`Remote host is not available to change state for switch: ${name}`);
+                    }))), catchError(() => {
+                throw new BadRequestException(`No switch found for name: ${name}`);
+            }));
     }
 }

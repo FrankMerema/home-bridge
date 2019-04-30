@@ -15,17 +15,17 @@ export class HostController {
     }
 
     @Get(':name/status')
-    getHostStatus(@Param() name: string): Observable<{ status: HostStatus }> {
+    getHostStatus(@Param('name') name: string): Observable<{ status: HostStatus }> {
         return this.hostService.getHostStatus(name);
     }
 
     @Get(':name')
-    getHost(@Param() name: string): Observable<HostModel> {
+    getHost(@Param('name') name: string): Observable<HostModel> {
         return this.hostService.getHost(name);
     }
 
     @Delete(':ip')
-    deleteHost(@Param() ip: string): Observable<{}> {
+    deleteHost(@Param('ip') ip: string): Observable<{}> {
         return this.hostService.deleteHost(ip);
     }
 }

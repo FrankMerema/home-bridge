@@ -26,7 +26,7 @@ async function bootstrap() {
 
     app.use(cookieParser());
     app.use(session({
-        secret: config.applicationSecret,
+        secret: config.applicationClientSecret,
         resave: false,
         saveUninitialized: false
     }));
