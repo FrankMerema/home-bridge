@@ -8,7 +8,23 @@
     "target": "es6",
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": "./"
+    "baseUrl": "src",
+    "paths": {
+      "@shared/models": [
+        "shared/models"
+      ],
+      "@shared/service": [
+        "shared/services"
+      ],
+      "@client/rest": [
+        "client"
+      ],
+      "@config": [
+        "config"
+      ]
+    }
   },
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }

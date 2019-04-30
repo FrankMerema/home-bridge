@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
+import { UserModel } from '@shared/models';
 import { Request } from 'express';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { UserModel } from '../shared/models/user/user.model';
 import { AuthenticationService } from './authentication.service';
 
 interface LoginRequest {

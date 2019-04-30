@@ -1,6 +1,6 @@
 import { Document } from 'mongoose';
-import { StateHistory } from './state-history.model';
-import { State } from './state.enum';
+import { StateHistory } from '../generic/state-history.model';
+import { State } from '../generic/state.enum';
 
 export interface SwitchModel extends Document {
     created: Date;

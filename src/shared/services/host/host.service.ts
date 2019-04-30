@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { HostModel, HostStatus } from '@shared/models';
 import { Model } from 'mongoose';
 import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { HostModel, HostStatus } from '../../shared/models/host/host.model';
 
 @Injectable()
 export class HostService {
@@ -13,6 +13,10 @@ export class HostService {
 
     getHost(name: string): Observable<HostModel> {
         return from(this.hostModel.findOne({name: name}));
+    }
+
+    getHostById(hostId: string): Observable<HostModel> {
+        return from(this.hostModel.findOne({_id: hostId}));
     }
 
     getHostStatus(name: string): Observable<{ status: HostStatus }> {
@@ -35,12 +39,12 @@ export class HostService {
         return from(this.hostModel.findOneAndUpdate({name: name}, newHost, {upsert: true, new: true}));
     }
 
-    deleteHost(id: string): Observable<HostModel> {
-        console.info(`Removing host with ip: ${id}`);
-        return from(this.hostModel.findOneAndRemove({_id: id}));
+    deleteHost(name: string): Observable<HostModel> {
+        console.info(`Removing host: ${name}`);
+        return from(this.hostModel.findOneAndDelete({name: name}));
     }
 
-    updateHostStatus(ip: string, status: HostStatus): Observable<HostModel> {
-        return from(this.hostModel.findOneAndUpdate({ip: ip}, {status: status}));
+    updateHostStatus(name: string, status: HostStatus): Observable<HostModel> {
+        return from(this.hostModel.findOneAndUpdate({name: name}, {status: status}));
     }
 }

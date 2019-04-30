@@ -1,10 +1,10 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { Param } from '@nestjs/common/decorators/http/route-params.decorator';
 import { AuthGuard } from '@nestjs/passport';
+import { UserModel } from '@shared/models';
 import { Request } from 'express';
 import { Observable } from 'rxjs';
-import { UserModel } from '../shared/models/user/user.model';
-import { UserService } from './user.service';
+import { UserService } from '../../shared/services/user/user.service';
 
 interface newUserDto {
     username: string;

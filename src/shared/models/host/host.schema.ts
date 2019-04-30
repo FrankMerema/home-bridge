@@ -1,7 +1,7 @@
 import { Schema } from 'mongoose';
 
 export const HostSchema = new Schema({
-        name: String,
+        name: {type: String, unique: true},
         hostName: String,
         ip: String,
         port: Number,

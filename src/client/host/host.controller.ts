@@ -1,7 +1,7 @@
 import { Controller, Delete, Get, Param } from '@nestjs/common';
+import { HostModel, HostStatus } from '@shared/models';
+import { HostService } from '@shared/service';
 import { Observable } from 'rxjs';
-import { HostModel, HostStatus } from '../../shared/models/host/host.model';
-import { HostService } from './host.service';
 
 @Controller('host')
 export class HostController {

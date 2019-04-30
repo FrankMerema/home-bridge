@@ -1,13 +1,13 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { UserModel } from '@shared/models';
+import { UserService } from '@shared/service';
 import { compare } from 'bcrypt';
 import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
 import { from, Observable } from 'rxjs';
 import { bindNodeCallback } from 'rxjs/internal/observable/bindNodeCallback';
 import { catchError, map, switchMap } from 'rxjs/operators';
-import { UserModel } from '../shared/models/user/user.model';
-import { UserService } from '../user/user.service';
 
 @Injectable()
 export class AuthenticationService {

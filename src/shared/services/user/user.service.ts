@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { UserModel } from '@shared/models';
 import { hash } from 'bcrypt';
 import { Model } from 'mongoose';
 import { from, Observable } from 'rxjs';
 import { switchMap, tap } from 'rxjs/operators';
-import { UserModel } from '../shared/models/user/user.model';
 
 @Injectable()
 export class UserService {

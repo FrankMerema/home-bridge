@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { SensorModel } from '@shared/models';
+import { SensorService } from '@shared/service';
 import { Observable } from 'rxjs';
-import { SensorModel } from '../../shared/models/sensor/sensor.model';
-import { SensorService } from './sensor.service';
 
 interface SensorCreationRequest {
     pin: number;

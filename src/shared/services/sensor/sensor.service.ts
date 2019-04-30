@@ -1,21 +1,11 @@
 import { BadRequestException, HttpService, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { HardwareCreatedResponse, SensorModel, State, StateResponse } from '@shared/models';
 import { Model } from 'mongoose';
 import { from, Observable } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
-import { SensorModel } from '../../shared/models/sensor/sensor.model';
-import { State } from '../../shared/models/switch/state.enum';
 import { HostService } from '../host/host.service';
 import { SwitchService } from '../switch/switch.service';
-
-interface SensorStateResponse {
-    state: number;
-}
-
-interface SensorCreatedResponse {
-    pin: number;
-    state: number;
-}
 
 @Injectable()
 export class SensorService {
@@ -43,21 +33,21 @@ export class SensorService {
 
     addSensor(pin: number, hostname: string, name: string, targetId?: string): Observable<SensorModel> {
         if (!pin || !hostname || !name) {
-            throw new BadRequestException('Should set pin, hostId and name!');
+            throw new BadRequestException('Should set pin, hostname and name!');
         }
 
         return this.hostService.getHost(hostname)
-            .pipe(switchMap(h =>
-                this.httpService.post<SensorCreatedResponse>(`http://${h.ip}:${h.port}/api/sensor`, {pin: pin})
+            .pipe(switchMap(host =>
+                this.httpService.post<HardwareCreatedResponse>(`http://${host.ip}:${host.port}/api/sensor`, {pin: pin})
                     .pipe(switchMap(createdSensor => {
                             const newSensor = {
                                 pin: createdSensor.data.pin,
-                                host: h._id,
+                                host: host._id,
                                 name: name,
                                 targetId: targetId
                             };
 
-                            return this.sensorModel.findOneAndUpdate({pin: pin, host: h._id}, newSensor, {
+                            return this.sensorModel.findOneAndUpdate({pin: pin, host: host._id}, newSensor, {
                                 upsert: true,
                                 new: true
                             });
@@ -67,7 +57,7 @@ export class SensorService {
     }
 
     deleteSensor(sensorId: string): Observable<void> {
-        return from(this.sensorModel.findOneAndRemove({_id: sensorId}))
+        return from(this.sensorModel.findOneAndDelete({_id: sensorId}))
             .pipe(switchMap(deletedSensor =>
                 this.hostService.deleteHost(deletedSensor.host)
                     .pipe(switchMap(host =>
@@ -91,7 +81,7 @@ export class SensorService {
     private setCorrectSensorState(sensorId: string): void {
         from(this.sensorModel.findOne({_id: sensorId}, null, {path: 'host'}))
             .pipe(switchMap(foundSensor =>
-                this.httpService.get<SensorStateResponse>(`http://${foundSensor.host.ip}:${foundSensor.host.port}/api/sensor/state/${foundSensor.pin}`)
+                this.httpService.get<StateResponse>(`http://${foundSensor.host.ip}:${foundSensor.host.port}/api/sensor/state/${foundSensor.pin}`)
                     .pipe(switchMap(sensorState => this.switchService.changeState(foundSensor.targetId, sensorState.data.state))))
             ).subscribe(() => {
         }, error => {

@@ -2,7 +2,7 @@ import { Schema } from 'mongoose';
 
 export const SwitchSchema = new Schema({
         host: {type: Schema.Types.ObjectId, ref: 'host'},
-        name: String,
+        name: {type: String, unique: true},
         pin: Number,
         state: Number,
         stateHistory: {type: Array, default: []}
