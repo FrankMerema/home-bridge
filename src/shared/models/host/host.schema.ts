@@ -8,7 +8,7 @@ export const HostSchema = new Schema({
         status: String
     },
     {
-        timestamps: {createdAt: 'created', updatedAt: false}
+        timestamps: {createdAt: 'created', updatedAt: 'lastUpdated'}
     });
 
 HostSchema.set('toJSON', {

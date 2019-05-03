@@ -22,7 +22,7 @@ export class HostController {
     }
 
     @Post('/:name/status')
-    updateHostStatus(@Param('name') name: string, @Body() status: HostStatus): Observable<HostModel> {
-        return this.hostService.updateHostStatus(name, status);
+    updateHostStatus(@Param('name') name: string, @Body() hostStatus: { status: HostStatus }): Observable<HostModel> {
+        return this.hostService.updateHostStatus(name, hostStatus.status);
     }
 }
