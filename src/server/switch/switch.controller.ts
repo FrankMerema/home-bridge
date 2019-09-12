@@ -5,12 +5,10 @@ import { Observable } from 'rxjs';
 
 @Controller('switch')
 export class SwitchController {
+  constructor(private switchService: SwitchService) {}
 
-    constructor(private switchService: SwitchService) {
-    }
-
-    @Get('all/:host')
-    getAllSwitchesForHost(@Param('host') name: string): Observable<SwitchModel[]> {
-        return this.switchService.getSwitches(name);
-    }
+  @Get('all/:host')
+  getAllSwitchesForHost(@Param('host') name: string): Observable<SwitchModel[]> {
+    return this.switchService.getSwitches(name);
+  }
 }

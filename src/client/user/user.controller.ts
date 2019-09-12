@@ -3,35 +3,32 @@ import { Param } from '@nestjs/common/decorators/http/route-params.decorator';
 import { AuthGuard } from '@nestjs/passport';
 import { UserModel } from '@shared/models';
 import { UserService } from '@shared/service';
-import { Request } from 'express';
 import { Observable } from 'rxjs';
 
-interface newUserDto {
-    username: string;
-    password: string;
+interface NewUserDto {
+  username: string;
+  password: string;
 }
 
 @Controller('user')
 export class UserController {
+  constructor(private userService: UserService) {}
 
-    constructor(private userService: UserService) {
-    }
+  @Get()
+  @UseGuards(AuthGuard('jwt'))
+  getCurrentUser(@Req() request): Observable<UserModel> {
+    return request.user;
+  }
 
-    @Get()
-    @UseGuards(AuthGuard('jwt'))
-    getCurrentUser(@Req() request: Request): Observable<UserModel> {
-        return request.user;
-    }
+  @Get('/:username')
+  @UseGuards(AuthGuard('jwt'))
+  getUser(@Param('username') username: string): Observable<UserModel> {
+    return this.userService.getUser(username);
+  }
 
-    @Get('/:username')
-    @UseGuards(AuthGuard('jwt'))
-    getUser(@Param('username') username: string): Observable<UserModel> {
-        return this.userService.getUser(username);
-    }
-
-    @Post()
-    @UseGuards(AuthGuard('jwt'))
-    addUser(@Body() userDto: newUserDto): Observable<UserModel> {
-        return this.userService.addUser(userDto.username, userDto.password);
-    }
+  @Post()
+  @UseGuards(AuthGuard('jwt'))
+  addUser(@Body() userDto: NewUserDto): Observable<UserModel> {
+    return this.userService.addUser(userDto.username, userDto.password);
+  }
 }

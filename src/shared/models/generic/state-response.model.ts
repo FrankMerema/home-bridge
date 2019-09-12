@@ -1,3 +1,3 @@
 export interface StateResponse {
-    state: number;
+  state: number;
 }

@@ -7,27 +7,16 @@ import { SwitchService } from './switch/switch.service';
 import { UserService } from './user/user.service';
 
 @Module({
-    imports: [
-        HttpModule,
-        MongooseModule.forFeature([
-            {name: 'Host', schema: HostSchema},
-            {name: 'Sensor', schema: SensorSchema},
-            {name: 'Switch', schema: SwitchSchema},
-            {name: 'User', schema: UserSchema}
-        ])
-    ],
-    providers: [
-        HostService,
-        SensorService,
-        SwitchService,
-        UserService
-    ],
-    exports: [
-        HostService,
-        SensorService,
-        SwitchService,
-        UserService
-    ]
+  imports: [
+    HttpModule,
+    MongooseModule.forFeature([
+      { name: 'Host', schema: HostSchema },
+      { name: 'Sensor', schema: SensorSchema },
+      { name: 'Switch', schema: SwitchSchema },
+      { name: 'User', schema: UserSchema }
+    ])
+  ],
+  providers: [HostService, SensorService, SwitchService, UserService],
+  exports: [HostService, SensorService, SwitchService, UserService]
 })
-export class ServiceModule {
-}
+export class ServiceModule {}

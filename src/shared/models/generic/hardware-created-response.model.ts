@@ -1,4 +1,4 @@
 export interface HardwareCreatedResponse {
-    pin: number;
-    state: number;
+  pin: number;
+  state: number;
 }

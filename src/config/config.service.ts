@@ -1,8 +1,7 @@
-const config = require('../../service.config.json');
-
 export class ConfigService {
+  private config = require('../../service.config.json');
 
-    get(key: string): string {
-        return config[key];
-    }
+  get(key: string): string {
+    return this.config[key];
+  }
 }

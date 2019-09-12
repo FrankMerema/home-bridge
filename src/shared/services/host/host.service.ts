@@ -7,44 +7,46 @@ import { map } from 'rxjs/operators';
 
 @Injectable()
 export class HostService {
+  constructor(@InjectModel('Host') private hostModel: Model<HostModel>) {}
 
-    constructor(@InjectModel('Host') private hostModel: Model<HostModel>) {
+  getHost(name: string): Observable<HostModel> {
+    return from(this.hostModel.findOne({ name }));
+  }
+
+  getHostById(hostId: string): Observable<HostModel> {
+    return from(this.hostModel.findOne({ _id: hostId }));
+  }
+
+  getHostStatus(name: string): Observable<{ status: HostStatus }> {
+    return from(this.hostModel.findOne({ name }, { status: true }));
+  }
+
+  getAllHosts(): Observable<HostModel[]> {
+    return from(this.hostModel.find()).pipe(map(hosts => (hosts.length ? hosts : [])));
+  }
+
+  addHost(hostName: string, name: string, ip: string, port: number): Observable<HostModel> {
+    if (!hostName || !name || !ip || !port) {
+      throw new BadRequestException('Should set hostName, name, ip and port!');
     }
 
-    getHost(name: string): Observable<HostModel> {
-        return from(this.hostModel.findOne({name: name}));
-    }
+    const newHost = { hostName, name, ip, port, status: 'online' } as HostModel;
+    console.info(`New host added: ${newHost.name}`);
 
-    getHostById(hostId: string): Observable<HostModel> {
-        return from(this.hostModel.findOne({_id: hostId}));
-    }
+    return from(
+      this.hostModel.findOneAndUpdate({ name }, newHost, {
+        upsert: true,
+        new: true
+      })
+    );
+  }
 
-    getHostStatus(name: string): Observable<{ status: HostStatus }> {
-        return from(this.hostModel.findOne({name: name}, {status: true}));
-    }
+  deleteHost(name: string): Observable<HostModel> {
+    console.info(`Removing host: ${name}`);
+    return from(this.hostModel.findOneAndDelete({ name }));
+  }
 
-    getAllHosts(): Observable<HostModel[]> {
-        return from(this.hostModel.find())
-            .pipe(map(hosts => hosts.length ? hosts : []));
-    }
-
-    addHost(hostName: string, name: string, ip: string, port: number): Observable<HostModel> {
-        if (!hostName || !name || !ip || !port) {
-            throw new BadRequestException('Should set hostName, name, ip and port!');
-        }
-
-        const newHost = <HostModel>{hostName: hostName, name: name, ip: ip, port: port, status: 'online'};
-        console.info(`New host added: ${newHost.name}`);
-
-        return from(this.hostModel.findOneAndUpdate({name: name}, newHost, {upsert: true, new: true}));
-    }
-
-    deleteHost(name: string): Observable<HostModel> {
-        console.info(`Removing host: ${name}`);
-        return from(this.hostModel.findOneAndDelete({name: name}));
-    }
-
-    updateHostStatus(name: string, status: HostStatus): Observable<HostModel> {
-        return from(this.hostModel.findOneAndUpdate({name: name}, {status: status}));
-    }
+  updateHostStatus(name: string, status: HostStatus): Observable<HostModel> {
+    return from(this.hostModel.findOneAndUpdate({ name }, { status }));
+  }
 }

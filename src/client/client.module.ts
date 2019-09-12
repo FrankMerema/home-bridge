@@ -7,16 +7,7 @@ import { SwitchController } from './switch/switch.controller';
 import { UserController } from './user/user.controller';
 
 @Module({
-    imports: [
-        AuthenticationModule,
-        ServiceModule
-    ],
-    controllers: [
-        HostController,
-        SensorController,
-        SwitchController,
-        UserController
-    ]
+  imports: [AuthenticationModule, ServiceModule],
+  controllers: [HostController, SensorController, SwitchController, UserController]
 })
-export class ClientModule {
-}
+export class ClientModule {}

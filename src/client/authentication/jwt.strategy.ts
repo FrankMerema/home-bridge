@@ -10,19 +10,18 @@ import { catchError } from 'rxjs/operators';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
+  constructor(private userService: UserService, private configService: ConfigService) {
+    super({
+      jwtFromRequest: (request: Request): string => request.cookies.SESSIONID || null,
+      secretOrKey: configService.get('applicationClientSecret')
+    });
+  }
 
-    constructor(private userService: UserService,
-                private configService: ConfigService) {
-        super({
-            jwtFromRequest: (request: Request): string => request.cookies['SESSIONID'] || null,
-            secretOrKey: configService.get('applicationClientSecret')
-        });
-    }
-
-    validate(payload: JwtPayload): Observable<UserModel> {
-        return this.userService.getUser(payload.username)
-            .pipe(catchError(() => {
-                throw new UnauthorizedException();
-            }));
-    }
+  validate(payload: JwtPayload): Observable<UserModel> {
+    return this.userService.getUser(payload.username).pipe(
+      catchError(() => {
+        throw new UnauthorizedException();
+      })
+    );
+  }
 }
