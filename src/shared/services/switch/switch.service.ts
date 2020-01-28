@@ -36,23 +36,25 @@ export class SwitchService {
 
     return this.hostService.getHost(hostname).pipe(
       switchMap(host =>
-        this.httpService.post<HardwareCreatedResponse>(`http://${host.ip}:${host.port}/api/switch`, { pin }).pipe(
-          switchMap(createdSwitch => {
-            const newSwitch = {
-              pin: createdSwitch.data.pin,
-              host: host._id,
-              name
-            };
+        this.httpService
+          .post<HardwareCreatedResponse>(`http://${host.ip}:${host.port}/api/switch`, { pin })
+          .pipe(
+            switchMap(createdSwitch => {
+              const newSwitch = {
+                pin: createdSwitch.data.pin,
+                host: host._id,
+                name
+              };
 
-            return this.switchModel.findOneAndUpdate({ pin, host: host._id }, newSwitch, {
-              upsert: true,
-              new: true
-            });
-          }),
-          catchError(() => {
-            throw new BadRequestException(`No host found/online for hostname: ${hostname}`);
-          })
-        )
+              return this.switchModel.findOneAndUpdate({ pin, host: host._id }, newSwitch, {
+                upsert: true,
+                new: true
+              });
+            }),
+            catchError(() => {
+              throw new BadRequestException(`No host found/online for hostname: ${hostname}`);
+            })
+          )
       ),
       catchError(() => {
         throw new BadRequestException(`No host found for hostname: ${hostname}`);

@@ -38,24 +38,26 @@ export class SensorService {
 
     return this.hostService.getHost(hostname).pipe(
       switchMap(host =>
-        this.httpService.post<HardwareCreatedResponse>(`http://${host.ip}:${host.port}/api/sensor`, { pin }).pipe(
-          switchMap(createdSensor => {
-            const newSensor = {
-              pin: createdSensor.data.pin,
-              host: host._id,
-              name,
-              targetId
-            };
+        this.httpService
+          .post<HardwareCreatedResponse>(`http://${host.ip}:${host.port}/api/sensor`, { pin })
+          .pipe(
+            switchMap(createdSensor => {
+              const newSensor = {
+                pin: createdSensor.data.pin,
+                host: host._id,
+                name,
+                targetId
+              };
 
-            return this.sensorModel.findOneAndUpdate({ pin, host: host._id }, newSensor, {
-              upsert: true,
-              new: true
-            });
-          }),
-          catchError(() => {
-            throw new BadRequestException(`No host found/online for hostname: ${hostname}`);
-          })
-        )
+              return this.sensorModel.findOneAndUpdate({ pin, host: host._id }, newSensor, {
+                upsert: true,
+                new: true
+              });
+            }),
+            catchError(() => {
+              throw new BadRequestException(`No host found/online for hostname: ${hostname}`);
+            })
+          )
       ),
       catchError(() => {
         throw new BadRequestException(`No host found for hostname: ${hostname}`);

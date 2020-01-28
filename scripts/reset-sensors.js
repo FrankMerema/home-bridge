@@ -1,2 +1,2 @@
-print("Removing sensors...");
+print('Removing sensors...');
 db.sensors.remove({});

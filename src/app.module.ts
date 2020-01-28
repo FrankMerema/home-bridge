@@ -5,7 +5,7 @@ import { ServerModule } from '@server/rest';
 import { AppController } from './app.controller';
 
 @Module({
-  imports: [ClientModule, MongooseModule.forRoot('mongodb://localhost/home-automation'), ServerModule],
+  imports: [ClientModule, MongooseModule.forRoot('mongodb://localhost/home-automation', { useNewUrlParser: true }), ServerModule],
   controllers: [AppController]
 })
 export class AppModule {}

@@ -1,2 +1,2 @@
-print("Removing hosts...");
+print('Removing hosts...');
 db.hosts.remove({});

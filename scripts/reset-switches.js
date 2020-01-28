@@ -1,2 +1,2 @@
-print("Removing switches...");
+print('Removing switches...');
 db.switches.remove({});

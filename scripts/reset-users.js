@@ -1,2 +1,2 @@
-print("Removing users...");
+print('Removing users...');
 db.users.remove({});
