@@ -1,0 +1,31 @@
+version: 2
+registries:
+  npm-registry-npm-pkg-github-com:
+    type: npm-registry
+    url: https://npm.pkg.github.com
+    token: "${{secrets.NPM_REGISTRY_NPM_PKG_GITHUB_COM_TOKEN}}"
+
+updates:
+- package-ecosystem: npm
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "04:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: y18n
+    versions:
+    - 4.0.1
+    - 4.0.2
+  - dependency-name: rxjs
+    versions:
+    - 6.6.3
+    - 6.6.6
+  - dependency-name: lodash
+    versions:
+    - 4.17.20
+  - dependency-name: "@types/supertest"
+    versions:
+    - 2.0.10
+  registries:
+  - npm-registry-npm-pkg-github-com
